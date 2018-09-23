@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    {% if title %}
+        <title>Camera - {{title}}</title>
+    {% else %}
+        <title>Camera</title>
+    {% endif %}
+    <!-- UIkit CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='uikit/css/uikit.min.css') }}" />
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='materialize/css/materialize.min.css') }}">
+
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Kanit" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body{
+            font-family: 'Kanit', sans-serif;
+        }
+    </style>
+    {% block style %}{% endblock %}
+</head>
+<body style="overflow-y: hidden">
+    <!-- Navbar for every main page -->
+    <div class="navbar-fixed">
+        <nav  style="opacity: 0.9;">
+            <div class="nav-wrapper blue-grey darken-4">
+                <a href="#" class="brand-logo center">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div id="message" class="card-panel {{ category }}" style="border-radius: 5px;">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}</a>
+                <!-- Nav Menu -->
+                <ul class="left hide-on-med-and-down">
+                    <!-- <li class="{{home.active if home}}"><a href="/">Home</a></li> -->
+                    <li class="{{camera_status.active if camera_status}}"><a href="/cameras">Monitors</a></li>
+                    <li class="{{processors.active if processors}}"><a href="#">Processors</a></li>
+                    {% if user.permission == 'admin' %}
+                        <li><a href="#">Admin</a></li>
+                    {% endif %}
+                    <li style="margin-left: 25vw;">
+                        {% block menuhead %}{% endblock %}
+                    </li>
+                </ul>
+                <!-- Nav Menu for mobile -->
+                <a href="" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+                <ul class="sidenav" id="mobile-demo">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/cameras">Cameras</a></li>
+                    <li><a href="#">Processors</a></li>
+                    {% if user.permission == 'admin' %}
+                        <li><a href="#">Admin</a></li>
+                    {% endif %}
+                </ul>
+                
+                <!-- Authenticated Display -->
+                <ul class="right">
+                    {% if user %}
+                        <li class="valign-wrapper">
+                            <img class="circle" src={{user.picture}} style="height: 5vh; width: 5vh; margin-right: 5px">
+                            {{user.name}}
+                        </li>
+                        <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                    {% else %}
+                        <li><a href="{{url_for('login')}}">Login</a></li>
+                    {% endif %} 
+                </ul>
+            </div>
+        </nav>
+    </div>
+    <div class="row" class="grey darken-4" style="background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTBVO8DKFxWdoiQpxGtr5BxWsFIOpfT2ezaKYKQVAWWDgv1eDfq'); background-repeat: no-repeat; background-size: 120%; height: 93vh; overflow-y: hidden; margin-bottom: 0; margin-top: 0px">
+        <div class="col s12">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+    
+    
+    <!-- JQuery -->
+    <script src="{{ url_for('static', filename='jquery/dist/jquery.min.js') }}"></script>
+    <!-- Materialize JS -->
+    <script src="{{ url_for('static', filename='materialize/js/materialize.min.js') }}"></script>
+    <!-- UIkit JS -->
+    <script src="{{ url_for('static', filename='uikit/js/uikit.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='uikit/js/uikit-icons.min.js') }}"></script>
+    <!-- Nav Menu function for mobile -->
+    <script>
+        
+        M.AutoInit();
+        setInterval(() => {$('#message').fadeOut(1000)}, 1500);
+        
+    </script>
+    {% block script %}{% endblock %}
+</body>
+</html>

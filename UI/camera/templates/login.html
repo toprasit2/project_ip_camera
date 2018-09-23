@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="container" >
+    <!-- Header -->
+    <h2>Login</h2>
+    <form class="col s12" method="POST" action="">
+        <!-- CSRF -->
+        {{ form.hidden_tag() }}
+        <div class="row">
+            <!-- Email Feild input -->
+            <div class="input-field col s12">
+                    {{ form.email.label(class="form-control-label") }}
+                    {% if form.email.errors %}
+                        {{form.email(class="validate  invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.email.errors %}
+                                <span class="red-text">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.email(class="validate") }}
+                    {% endif %}
+            </div>
+            <!-- Password Feild input -->
+            <div class="input-field col s12">
+                    {{ form.password.label(class="form-control-label") }}
+                    {% if form.password.errors %}
+                        {{form.password(class="validate  invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.password.errors %}
+                                <span class="red-text">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.password(class="validate") }}
+                    {% endif %}
+            </div>
+            <!-- Remember Feild input -->
+            <p>
+                <label>
+                    {{ form.remember(class="form-check-input") }}
+                    <span>{{ form.remember.label(class='form-check-label') }}</span>
+                </label>
+            </p>
+        </div>
+        <!-- Submit Button -->
+        <div class="row center">
+            {{ form.submit(class="btn light-blue lighten-1") }}
+        </div>
+    </form>
+</div>
+
+{% endblock %}

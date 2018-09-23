@@ -1,0 +1,110 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+    {% if current_user.is_authenticated %}
+        <div class="row">
+            <div class="col s12 m2">
+                <h3>Group</h3>
+                <ul class="collection">
+                        <li class="collection-item"><a href="{{ url_for('cameras')}}">All</a></li>
+                        {% for group in groups %}
+                        <li class="collection-item">
+                            <div>
+                                <a href="{{ url_for('group_cameras', group_id=group.id) }}">
+                                    {{ group.group_name }}
+                                </a>
+                                <a  class="secondary-content">
+                                    <a href="{{ url_for('delete_group', group_id=group.id) }}" class="secondary-content"><i class="material-icons left">delete</i></a>
+                                    <a href="{{ url_for('edit_group', group_id=group.id) }}" class="secondary-content"><i class="material-icons left">mode_edit</i></a>
+                                </a>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    <div class="collection-item row center">
+                        <a href="/add_group" class="btn btn-floating waves-effect waves-light light-blue darken-4">+</a>
+                    </div>
+                </ul>
+            </div>
+            <div class="col s12 m10">
+                <!-- HEAD CONTENT -->
+                {% if group_name %}
+
+                    <h3>Camera in {{group_name}}</h3>
+
+                {% else %}
+
+                    <h3>All Camera</h3>
+
+                {% endif %}
+                <!-- Display Camera -->
+                {% for group in groups %}
+                
+                    {% if not group_name %}
+                        <h4>{{ group.group_name }}</h4>
+                        <hr>
+                        {% if cameras %}
+                            <div class="row" >
+                                <div class="carousel ">
+                                {% for camera in cameras %}
+                                    {% if camera.group_name == group.group_name %}
+                                        <div class="col s12 m6 l3 carousel-item" >
+                                            <div class="card ">
+                                                <div class="card-image">
+                                                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrT1U7oxzpdAjl8DfwJUOVI5Wtd-EjGEmnEJJjDxeRQfqghk5o" max-height="480px" max-width="640px">
+                                                    <span class="card-title">{{camera.name}}</span>
+                                                </div>
+                                            </div>
+                                        </div> 
+                                    {% endif %}
+                                {% endfor %}  
+                                </div> 
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        {% if cameras %}
+                            <div class="row container">
+                                {% for camera in cameras %}
+                                    {% if camera.group_name == group.group_name %}
+                                        <div class="col s12 m6 l3" >
+                                            <div class="card ">
+                                                <div class="card-image">
+                                                    <img src="https://www.w3schools.com/howto/img_fjords.jpg" max-height="400px" max-width="600px">
+                                                    <span class="card-title">{{camera.name}}</span>
+                                                </div>
+                                            </div>
+                                        </div> 
+                                    {% endif %}
+                                {% endfor %}  
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                    
+                {% endfor %}
+                <!-- ADD Button for group-->
+                {% if group_id %}
+                    <div class="collection-item row center">
+                        <a href="{{ url_for('add_camera', group_id=group_id) }}" class="btn btn-floating light-blue darken-1">+</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <h5>Please Login !</h5>
+    {% endif %}
+
+{% endblock %}
+{% block script %}
+<script>
+    $(document).ready(function(){
+        $('.carousel').carousel();
+        $('.carousel').carousel({
+            numVisible: 10,
+            fullWidth: true,
+            noWrap: true,
+            dist: 0
+        });
+        $('.carousel').carousel('set', 0);
+    });
+</script>
+{% endblock %}

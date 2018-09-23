@@ -1,0 +1,232 @@
+{% extends "layout.html" %}
+{% block style %}
+<style>
+    body{
+        scrollbar-face-color: #b46868;
+        scroll-behavior: smooth;
+    }
+} 
+</style>
+{% endblock %}
+{% block content %}
+
+    {% if user %}
+    <div class="row" style="height: 100%; overflow-y: hidden; " >
+        <div class="col m8" style="padding: 0 36px 0 36px">
+
+            <!-- CAMERAS -->
+            <div class="row">
+                    <div class="col m8" >
+                            <div class="row" style="margin-bottom: 0">
+                                <form class="col s12">
+                                    <div class="row" style="margin-bottom: 0">
+                                    <div class="input-field col s12">
+                                        <textarea style="color: white" id="myInput" onkeyup="myFunction()" class="materialize-textarea"></textarea>
+                                        <label for="myInput" style="color: white">Search Group</label>
+                                    </div>
+                                    </div>
+                                </form>
+                            </div>
+                    </div>
+                    <div class="col m4" style=" padding: 20px;">
+                        <span class="white-text right"><span style="margin-right: 5px; color: steelblue">CAMERAS GROUP</span><a href="{{url_for('add_group',next=request.path)}}" class="btn blue-grey btn-floating waves-effect waves-light"><i class="material-icons">add</i></a></span> 
+                    </div>
+                    <div class="col m12" style=" padding: 10px;">
+                            <div style="overflow-y: auto; height: 45vh">
+                                    <ul id="myUL">
+                                        {% for i in groups %}
+                                        <li class="myli" style="margin-bottom: 50px">
+                                            
+                                            <hr class="uk-divider-icon" style="color: steelblue">
+                                            <div class="uk-position-relative uk-visible-toggle uk-light" uk-slider="center: true">
+            
+                                                <ul class="uk-slider-items uk-grid">
+                                                    {% for j in cameras %}
+                                                        {% if j.group_name==i.group_name %}
+                                                        <li class="uk-width-1-4">
+                                                            <div class="uk-inline">
+                                                                <img src="https://getuikit.com/docs/images/photo.jpg" alt="">
+                                                                <div class="uk-overlay uk-light uk-position-bottom">
+                                                                    <p class="center" style="font-size: 20px">{{j.name}}</p>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                    <li class="uk-width-2-5" style="height: 250px;">
+                                                        <div class="center" style="padding: 25%">
+                                                            <a class="btn-floating waves-effect waves-light light-blue lighten-1" href="{{url_for('add_camera',group_name=i.group_name,next=request.path)}}">
+                                                                <i class="material-icons">add</i>
+                                                            </a>
+                                                            <p>ADD Camera in {{i.group_name}}</p>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            
+                                                <a class="uk-position-center-left uk-position-small uk-hidden-hover" href="#" uk-slidenav-previous uk-slider-item="previous"></a>
+                                                <a class="uk-position-center-right uk-position-small uk-hidden-hover" href="#" uk-slidenav-next uk-slider-item="next"></a>
+                                            
+                                            </div>   
+                                            <a class="center"><p style="font-size: 30px;margin-top: 20px; color: steelblue">{{i.group_name}}</p></a>
+                                        </li>               
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                    </div>
+                </div>
+            <!-- PROCESSER -->
+            <div class="row" style="height: 30vh;">
+                <!-- <div class="col m4" style="height: 30vh; padding-left: 0px;">
+                    <div id="history white" style="height: 30vh; border-radius: 5px; overflow-y: scroll;">
+                      <div style=" padding: 10px; width: 100%;">
+                            <ul class="collection">
+                                {% for i in range(0,50) %}
+                                    <li class="collection-item avatar">
+                                      <img src={{user.picture}} alt="" class="circle">
+                                      <span class="title">{{user.name}}</span>
+                                      <p>add MOO group<br>
+                                        12 Jan 2018 12:02:00
+                                      </p>
+                                      <a href="#!" class="secondary-content"><i class="material-icons">grade</i></a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                      </div>
+                    </div>
+                </div> -->
+                <div class="col m6" style="height: 30vh; padding-left: 8px;">
+                    <div id="cpu_div"  class="light-blue" style="height: 100%; border-radius: 5px;">
+
+                    </div>
+                </div>
+                <div class="col m6" style="height: 30vh; padding-left: 8px;">
+                    <div id="ram_div"  class="light-blue" style="height: 100%; border-radius: 5px;">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col m4 blue-grey lighten-3" style="overflow: auto; height: 94vh;">
+            <div style="padding-left: 2%">
+                    <p class="" style="font-size: 20px; margin-bottom: 0"> 
+                        <span >Group: CoE</span><br>
+                        <span >Description: บริเวณภาควิชา</span></p>
+            </div>
+            <div class="row center" style="padding: 2%; margin-bottom: 0">
+                <a><img width="96%" src="https://getuikit.com/docs/images/photo.jpg"></a>
+            </div>
+            <div class="uk-inline center" style="width: 100%;">
+                <div id="map" style="height: 300px; width: 96%; margin-left: 2%"></div>
+                <!-- <div class="uk-overlay uk-light uk-position-bottom">
+                    <a class="btn blue-grey waves-effect waves-light">รายละเอียด</a>
+                </div> -->
+            </div>
+            <div class="" style="margin-top: 2vh; margin-bottom: 2vh; padding-left: 2%">
+                <a class="btn btn-large blue-grey">More info</a>
+                <a class="btn btn-large blue-grey">Group</a>
+                <a class="btn btn-large blue-grey">Processor</a>
+            </div>
+        </div>
+    </div>
+        
+    {% else %}
+        <h5>Please Login !</h5>
+    {% endif %}
+{% endblock %}
+{% block script %}
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <!-- CPU Chart -->
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+            ['Times', 'Values'],
+            {% for value,label in set %}
+                [
+                    "{{label}}", {{value}}
+                ],
+            {% endfor %}
+        ]);
+
+        var options = {
+          title: 'CPU',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('cpu_div'));
+
+        chart.draw(data, options);
+      }
+    </script>
+    <!-- RAM Chart-->
+    <script type="text/javascript">
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawChart);
+  
+        function drawChart() {
+          var data = google.visualization.arrayToDataTable([
+            ['Times', 'Values'],
+            ['2004',  1000],
+            ['2005',  1170],
+            ['2006',  660],
+            ['2007',  1030]
+          ]);
+  
+          var options = {
+            title: 'RAM',
+            curveType: 'function',
+            legend: { position: 'bottom' }
+          };
+  
+          var chart = new google.visualization.LineChart(document.getElementById('ram_div'));
+  
+          chart.draw(data, options);
+        }
+    </script>
+    <!-- GOOGLE MAP Camera -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+      var map;
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 19,
+          center: new google.maps.LatLng(7.007278, 100.502278),
+          mapTypeId: 'roadmap'
+        });
+        var marker = new google.maps.Marker({
+            position: new google.maps.LatLng(7.007278, 100.502278),
+            icon: "https://firebasestorage.googleapis.com/v0/b/southern-iot-box.appspot.com/o/logo.png?alt=media&token=d668e853-7062-4501-939b-37ae3b60466d",
+            map: map,
+            title: "cm001"
+          });
+        marker.addListener('click', function() {
+        infowindow_modal.open(map, marker);
+        });
+      }
+    </script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDSy8IpIIWRDsFT0j-sLOt5Ga13GSFmooo&callback=initMap">
+    </script>
+    <!-- search group -->
+    <script>
+            function myFunction() {
+                var input, filter, table, tr, td, i;
+                input = document.getElementById("myInput");
+                filter = input.value.toUpperCase();
+                ul = document.getElementById("myUL");
+                li = ul.getElementsByClassName("myli");
+                for (i = 0; i < li.length; i++) {
+                    a = li[i].getElementsByTagName("a")[3];
+                    txt = a.innerHTML
+                    if (txt.toUpperCase().indexOf(filter) > -1) {
+                        li[i].style.display = "";
+                    } else {
+                        li[i].style.display = "none";
+                    }
+                }
+            }
+    </script>
+{% endblock %}

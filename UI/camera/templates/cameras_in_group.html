@@ -1,0 +1,101 @@
+{% extends "cameras.html" %}
+{% block style_camera %}
+    <style>
+        .camera_name{
+            opacity: 0;
+        }
+        .camera_name:hover{
+            opacity: 1;
+        }
+    </style>
+{% endblock %}
+{% block menuhead %}
+<div class="center">
+    <div class="row">
+        <div class="col m2">
+            {{group.group_name}}
+        </div>
+        <div class="col m2">
+                <a href="{{'/cameras/'+group.id+'/1x1'}}" class="btn">1x1</a>
+            </div>
+        <div class="col m2">
+            <a href="{{'/cameras/'+group.id+'/2x2'}}" class="btn">2x2</a>
+        </div>
+        <div class="col m2">
+            <a href="{{'/cameras/'+group.id+'/3x3'}}" class="btn">3x3</a>
+        </div>
+        <div class="col m2">
+            <a href="{{'/cameras/'+group.id+'/4x4'}}" class="btn">4x4</a>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}
+{% block cameras %}
+<div style="padding-left: 2vw">
+    <div style="overflow-y: scroll; height:94vh; width: 100%" class="scroll4" >
+        <div class="row" style="width: 100%" >
+           
+                {% for g in groups %}
+                    {% if g.group_name == group.group_name %}   
+                        
+                            {% for cameras in g['cameras_'+display] %}
+                            <div class="col m12" id={{ loop.index0 }}>
+                                <div class="row">
+                                    {% for c in cameras %}
+                                    {% if display == '3x3' %}
+                                    <div class="col m4 uk-inline center" style="padding: 1px 1px 0px 0px" onload="updateImage();">
+                                        <!-- <video class="responsive-video" controls width="1920px" height="1080px" autoplay loop>
+                                            <source src="https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4" type="video/mp4">
+                                        </video> -->
+                                        <img src="http://61.90.186.189:8000/cgi-bin/faststream.jpg?stream=half&fps=15&rand=COUNTER#.W54ndWxTRTI.link" width="1920px" height="1080px" />
+                                        <div class="uk-overlay uk-light uk-position-bottom camera_name">
+                                            <p class="center " style="font-size: 20px;"><a href="#">{{c.name}}</a></p>
+                                        </div>
+                                    </div>
+                                    {% elif display == '2x2' %}
+                                    <div class="col m6 uk-inline center" style="padding: 1px 1px 0px 0px">
+                                        <!-- <video class="responsive-video" controls width="1920px" height="1080px" autoplay loop>
+                                            <source src="https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4" type="video/mp4">
+                                        </video> -->
+                                        <img src="http://61.90.186.189:8000/cgi-bin/faststream.jpg?stream=half&fps=15&rand=COUNTER#.W54ndWxTRTI.link" width="1920px" height="1080px" />
+                                        <div class="uk-overlay uk-light uk-position-bottom camera_name">
+                                            <p class="center " style="font-size: 20px;"><a href="#">{{c.name}}</a></p>
+                                        </div>
+                                    </div>
+                                    {% elif display == '4x4' %}
+                                    <div class="col m3 uk-inline center" style="padding: 1px 1px 0px 0px">
+                                        <video class="responsive-video" controls width="1920px" height="1080px" autoplay loop>
+                                            <source src="https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4" type="video/mp4">
+                                        </video>
+                                        <div class="uk-overlay uk-light uk-position-bottom camera_name">
+                                            <p class="center " style="font-size: 20px;"><a href="#">{{c.name}}</a></p>
+                                        </div>
+                                    </div>
+                                    {% elif display == '1x1' %}
+                                    <div class="col m12 uk-inline center" style="padding: 25px 1px 0px 0px">
+                                        <video class="responsive-video" controls width="1920px" height="1080px" autoplay loop>
+                                            <source src="https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4" type="video/mp4">
+                                        </video>
+                                        <div class="uk-overlay uk-light uk-position-bottom camera_name">
+                                            <p class="center " style="font-size: 20px;"><a href="#">{{c.name}}</a></p>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                            <div class="col bottom">
+                                <ul class="tabs blue-grey darken-3">
+                                    {% for i in range(0,g['display_'+display]) %}
+                                    <li class="tab col"><a href="#{{i}}">{{i+1}}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+
+                    {% endif %}
+                {% endfor %}
+        </div>
+</div>
+{% endblock %}

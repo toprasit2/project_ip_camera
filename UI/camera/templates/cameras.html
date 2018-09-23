@@ -1,0 +1,228 @@
+{% extends "layout.html" %}
+{% block style %}
+<style>
+    #gMenu {
+        width: 13vw;
+    }
+    #groupMenu{
+        height: 52vh; 
+        width: 14vw; 
+        overflow-y: hidden;
+    }
+    #groupMenu:hover{
+        overflow-y: auto;
+    }
+
+    .scroll4::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    .scroll4::-webkit-scrollbar-thumb {
+        background:  rgb(190, 189, 189);
+        border-radius: 20px;
+    }
+
+    .scroll4::-webkit-scrollbar-track {
+        background:rgb(48, 47, 47);
+        border-radius: 5px;
+    }
+
+</style>
+    {% block style_camera %}{% endblock %}
+{% endblock %}
+{% block content %}
+    
+    {% if user %}
+    <div class="row"  onload="myshow()">
+        <div class="col m2" style="padding: 0 0 0 0; width: 14vw">
+            <div id="gMenu" >
+                <div id="groupMenu" class="scroll4" >
+                    <ul id="menu" class="collection" style="margin: 0; border: none">
+                        <a href="/cameras" class="black-text" style="opacity: .8;">
+                            <li class="collection-item blue-grey darken-3 black-text">
+                                All Groups
+                            </li>
+                        </a>
+                        
+                        {% for group in groups %}
+                        <a href="{{'/cameras/'+group.id+'/3x3'}}">
+                            <li class="collection-item blue-grey darken-2 white-text z-depth-1 hoverable" style="height: 50px; padding-left: 2px; padding-right: 2px">
+                                <span><img src="https://cdn0.iconfinder.com/data/icons/thin-security/57/thin-441_webcam_camera_ip_security_surveillance-512.png" alt="Smiley face" width="35" height="35"></span>
+                                <span style="margin-left: 5px;">{{group.group_name}}</span>
+                                <span  href="#!" class="right"><span class="badge" style="margin-left: 0">{{group.count}}</span></span>
+                            </li>
+                        </a>
+                        {% endfor %}
+                        
+                        <li id="toTop" class="collection-item blue-grey black-text">
+                            <div style="height: 30px;">
+                                <a onclick="scrollWinTop()" class="secondary-content  black-text" style="font-size: 25px;">To Top</a>
+                            </div>
+                        </li>
+                    </ul>
+                    
+                </div>
+                <div id="toDown" class="btn"  style="width: 14vw" onclick="scrollWinDown()">
+                    <i class="large material-icons">keyboard_arrow_down</i>
+                </div>
+            </div>
+            <div id="all_add" style="height: 35vh; width: 14vw" class="uk-inline">
+                <div class="uk-position-bottom-center center"style="margin-bottom: 120px">
+                    <a href="{{url_for('add_group',next=request.path)}}" 
+                        class="btn blue-grey btn-floating waves-effect waves-light">
+                        <i class="material-icons">add</i>
+                    </a>
+                    <p class="white-text">ADD Group</p>
+                </div>
+                    
+                {% if group %}
+                <div class="uk-position-bottom-center center" style="margin-bottom: 0px">
+                    <a class="btn blue-grey btn-floating waves-effect waves-light" href="{{url_for('add_camera',group_name=group.group_name,next=request.path)}}">
+                        <i class="material-icons">add</i>
+                    </a>
+                    <p class="white-text">ADD Camera in {{group.group_name}}</p>
+                </div>
+                {% endif %}
+            </div>            
+        </div>
+        <div class="col m10" style="padding: 0 0 0 0;width: 86vw">
+            {% block cameras %}{% endblock %}
+        </div>
+        
+        <!-- <div id="all" class="col m10" style="padding: 0 0 0 0">
+            <div class="row">
+                <div class="col m2" ></div>
+                <div class="col m8" >
+                        <div class="row" style="margin-bottom: 0">
+                            <form class="col s12">
+                                <div class="row" style="margin-bottom: 0">
+                                <div class="input-field col s12">
+                                    <textarea style="color: white" id="myInput" onkeyup="myFunction()" class="materialize-textarea"></textarea>
+                                    <label for="myInput" style="color: white">Search Group</label>
+                                </div>
+                                </div>
+                            </form>
+                        </div>
+                </div>
+                <div class="col m2" ></div>
+                <div class="col m12" style=" padding: 10px;">
+                    <div style="overflow-y: auto; height: 80vh">
+                        <ul id="myUL">
+                            {% for i in groups %}
+                            <li class="myli" style="margin-bottom: 50px">
+                                
+                                <hr class="uk-divider-icon" style="color: steelblue">
+                                <div class="uk-position-relative uk-visible-toggle uk-light" uk-slider="center: true">
+
+                                    <ul class="uk-slider-items uk-grid">
+                                        {% for j in cameras %}
+                                            {% if j.group_name==i.group_name %}
+                                            <li class="uk-width-1-4">
+                                                <div class="uk-inline">
+                                                    <video class="responsive-video" controls>
+                                                        <source src="https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4" type="video/mp4">
+                                                    </video>
+                                                    <div class="uk-overlay uk-light uk-position-bottom">
+                                                        <p class="center" style="font-size: 20px">{{j.name}}</p>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                        <li class="uk-width-2-5" style="height: 250px;">
+                                            <div class="center" style="padding: 15%">
+                                                <a class="btn-floating waves-effect waves-light light-blue lighten-1" href="{{url_for('add_camera',group_name=i.group_name,next=request.path)}}">
+                                                    <i class="material-icons">add</i>
+                                                </a>
+                                                <p>ADD Camera in {{i.group_name}}</p>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                
+                                    <a class="uk-position-center-left uk-position-small uk-hidden-hover" href="#" uk-slidenav-previous uk-slider-item="previous"></a>
+                                    <a class="uk-position-center-right uk-position-small uk-hidden-hover" href="#" uk-slidenav-next uk-slider-item="next"></a>
+                                
+                                </div>   
+                                <a href="{{'#'+ i.group_name}}" class="center"><p style="font-size: 30px;margin-top: 20px; color: steelblue">{{i.group_name}}</p></a>
+                            </li>               
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% for group in groups %}
+        <div id={{group.group_name}} class="col m10" style="padding: 0 0 0 0">
+            <div class="row uk-inline" style="padding-left:10px; overflow-y: auto; height: 93vh;">
+            {% for i in range(0,7) %}
+                {% for j in cameras %}
+                    {% if j.group_name==group.group_name %}
+                    <div class="col m4" style="padding:0 2px 2px 0px">
+                        <div class="uk-inline">
+                            <video class="responsive-video" controls autoplay loop>
+                                <source src="https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4" type="video/mp4" >
+                            </video>
+                            <div class="uk-overlay uk-light uk-position-bottom">
+                                <p class="center" style="font-size: 20px">{{j.name}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+                <div class="uk-position-bottom-center uk-position-fixed uk-light center" style="margin-bottom: 20px">
+                    <a class="btn-large btn-floating light-blue lighten-1" href="{{url_for('add_camera',group_name=group.group_name,next=request.path)}}">
+                        <i class="material-icons">add</i>
+                    </a>
+                    <p>ADD Camera in {{group.group_name}}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %} -->
+            
+    </div>
+    {% else %}
+        <h5>Please Login !</h5>
+    {% endif %}
+
+{% endblock %}
+{% block script %}
+    <!-- search group -->
+    <script>
+            function myFunction() {
+                var input, filter, table, tr, td, i;
+                input = document.getElementById("myInput");
+                filter = input.value.toUpperCase();
+                ul = document.getElementById("myUL");
+                li = ul.getElementsByClassName("myli");
+                for (i = 0; i < li.length; i++) {
+                    a = li[i].getElementsByTagName("a")[0];
+                    txt = a.innerHTML
+                    if (txt.toUpperCase().indexOf(filter) > -1) {
+                        li[i].style.display = "";
+                    } else {
+                        li[i].style.display = "none";
+                    }
+                }
+            }
+    </script>
+    <!-- Group MENU SCROLLDOWN -->
+    <script>
+        function scrollWinDown() {
+            document.getElementById("groupMenu").scrollTop += 50;
+        }
+        function scrollWinTop() {
+            document.getElementById("groupMenu").scrollTop =0;
+        }
+        $(document).ready(function(){
+            if (document.getElementById("groupMenu").scrollHeight < 500){
+                document.getElementById("toTop").style.display='none'
+                document.getElementById("toDown").style.display='none'
+            }
+            else{
+                document.getElementById("toTop").style.display='block'
+                document.getElementById("toDown").style.display='block'
+            }
+        })
+    </script>
+{% endblock %}

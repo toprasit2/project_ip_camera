@@ -1,0 +1,77 @@
+{% extends "layout.html" %}
+{% block style %}
+<style>
+    .scroll4::-webkit-scrollbar {
+        width: 10px;
+    }
+    
+    .scroll4::-webkit-scrollbar-thumb {
+        background: rgb(48, 47, 47);
+        border-radius: 20px;
+    }
+
+    .scroll4::-webkit-scrollbar-track {
+        background: rgb(190, 189, 189);
+        border-radius: 5px;
+    }
+
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="container" >
+    <h2 style="color: steelblue">Add Group</h2>
+    <div class="scroll4" style="overflow-y: auto; height: 90vh;">
+        <form class="col s12" method="POST" action="">
+            {{ form.hidden_tag() }}
+            <div class="row">
+                <div class="input-field col s12">
+                        {{ form.group_name.label(class="form-control-label",style="color: white") }}
+                        {% if form.group_name.errors %}
+                            {{form.group_name(class="validate  invalid",style="color: white") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.group_name.errors %}
+                                    <span class="red-text">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.group_name(class="validate",style="color: white") }}
+                        {% endif %}
+                </div>
+            </div>
+            <h5 style="color: steelblue">Show in map:</h3>
+                <div class="input-field col s6">
+                    {{ form.c_lat.label(class="form-control-label", style="color: white") }}
+                    {% if form.c_lat.errors %}
+                        {{form.c_lat(class="validate  invalid",style="color: white") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.c_lat.errors %}
+                                <span class="red-text">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.c_lat(class="validate",style="color: white") }}
+                    {% endif %}
+                </div>
+                <div class="input-field col s6">
+                    {{ form.c_long.label(class="form-control-label", style="color: white") }}
+                    {% if form.c_long.errors %}
+                        {{form.c_long(class="validate  invalid",style="color: white") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.c_long.errors %}
+                                <span class="red-text">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.c_long(class="validate",style="color: white") }}
+                    {% endif %}
+                </div>
+            <div class="row">
+                {{ form.submit(class="btn light-blue lighten-1") }}
+                <a href="{{back}}" class="btn light-blue lighten-1">cancle</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="container" >
+    <!-- Header -->
+    <h2>Register</h2>
+    <form class="col s12" method="POST" action="">
+        <!-- CSRF -->
+        {{ form.hidden_tag() }}
+        <div class="row">
+            <!-- Name Feild input -->
+            <div class="input-field col s12">
+                    {{ form.name.label(class="form-control-label") }}
+                    {% if form.name.errors %}
+                        {{form.name(class="validate  invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.name.errors %}
+                                <span class="red-text">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.name(class="validate") }}
+                    {% endif %}
+            </div>
+            <!-- Email Feild input -->
+            <div class="input-field col s12">
+                    {{ form.email.label(class="form-control-label") }}
+                    {% if form.email.errors %}
+                        {{form.email(class="validate  invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.email.errors %}
+                                <span class="red-text">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.email(class="validate") }}
+                    {% endif %}
+            </div>
+            <!-- Password Feild input -->
+            <div class="input-field col s12">
+                    {{ form.password.label(class="form-control-label") }}
+                    {% if form.password.errors %}
+                        {{form.password(class="validate  invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.password.errors %}
+                                <span class="red-text">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.password(class="validate") }}
+                    {% endif %}
+            </div>
+            <!-- Confirm Password Feild input -->
+            <div class="input-field col s12">
+                    {{ form.confirm_password.label(class="form-control-label") }}
+                    {% if form.confirm_password.errors %}
+                        {{form.confirm_password(class="validate  invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.confirm_password.errors %}
+                                <span class="red-text">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.confirm_password(class="validate") }}
+                    {% endif %}
+            </div>
+        </div>
+        <!-- Submit Button -->
+        <div class="row center">
+            {{ form.submit(class="btn light-blue lighten-1") }}
+        </div>
+    </form>
+</div>
+
+{% endblock %}

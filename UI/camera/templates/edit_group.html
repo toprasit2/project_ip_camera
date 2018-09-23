@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="container" >
+    <!-- Header -->
+    <h2>Edit Group</h2>
+    <form class="col s12" method="POST" action="">
+        <!-- CSRF -->
+        {{ form.hidden_tag() }}
+        <div class="row">
+            <!-- Group Name Feild input -->
+            <div class="input-field col s12">
+                    {{ form.group_name.label(class="form-control-label") }}
+                    {% if form.group_name.errors %}
+                        {{form.group_name(class="validate  invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.group_name.errors %}
+                                <span class="red-text">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.group_name(class="validate") }}
+                    {% endif %}
+            </div>
+        </div>
+        <!-- Submit Button -->
+        <div class="row center">
+            {{ form.submit(class="btn light-blue lighten-1") }}
+        </div>
+    </form>
+</div>
+
+{% endblock %}

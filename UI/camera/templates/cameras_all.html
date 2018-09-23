@@ -1,0 +1,58 @@
+{% extends "cameras.html" %}
+
+{% block menuhead %}
+<div class="row">
+    <div class="input-field col s10">
+        <textarea style="color: white;" id="myInput" onkeyup="myFunction()" class="materialize-textarea" placeholder="Search group"></textarea>
+        
+    </div>
+    <div class="col s1">
+        <i class="material-icons ">search</i>
+    </div>
+</div>
+{% endblock %}
+{% block cameras %}
+<div style="padding-left: 1vw">
+<div style="overflow-y: auto; height:94vh; width: 100%" class="scroll4" >
+<div style="width: 95%; margin-top: 20px">
+        <ul id="myUL">
+            {% for i in groups %}
+            <li class="myli">
+                <a style="font-size: 30px; color: steelblue" href="{{'/cameras/'+i.id+'/3x3'}}">{{i.group_name}}</a>
+                <hr  style="color: steelblue">
+                <div class="uk-position-relative uk-visible-toggle uk-light" uk-slider="center: true">
+
+                    <ul class="uk-slider-items uk-grid uk-child-width-1-3@m">
+                        {% for j in i['cameras'] %}
+                            <li>
+                                <div class="uk-inline">
+                                    <video class="responsive-video" controls width="1080px" height="1920px">
+                                        <source src="https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4" type="video/mp4">
+                                    </video>
+                                    <div class="uk-overlay uk-light uk-position-bottom">
+                                        <p class="center" style="font-size: 20px">{{j.name}}</p>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                        <li class="uk-width-1-3" style="height: 250px;">
+                            <div class="center" style="padding: 25%">
+                                <a class="btn-floating waves-effect waves-light light-blue lighten-1" href="{{url_for('add_camera',group_name=i.group_name,next=request.path)}}">
+                                    <i class="material-icons">add</i>
+                                </a>
+                                <p>ADD Camera in {{i.group_name}}</p>
+                            </div>
+                        </li>
+                    </ul>
+                
+                    <a class="uk-position-center-left uk-position-small uk-hidden-hover" href="#" uk-slidenav-previous uk-slider-item="previous"></a>
+                    <a class="uk-position-center-right uk-position-small uk-hidden-hover" href="#" uk-slidenav-next uk-slider-item="next"></a>
+                
+                </div>   
+            </li>               
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+</div>
+{% endblock %}

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, RadioField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from flask_login import current_user
 import requests, jwt, json
@@ -32,8 +32,8 @@ class LoginForm(FlaskForm):
 class GroupOfCamerasForm(FlaskForm):
     owner = StringField('Owner', validators=[DataRequired()])
     group_name = StringField('Group name', validators=[DataRequired(), Length(min=2, max=12)])    
-    c_lat = StringField('Lat', validators=[DataRequired(), Length(min=2, max=20)])
-    c_long = StringField('Long', validators=[DataRequired(), Length(min=2, max=20)])
+    # c_lat = StringField('Lat', validators=[DataRequired(), Length(min=2, max=20)])
+    # c_long = StringField('Long', validators=[DataRequired(), Length(min=2, max=20)])
     submit = SubmitField('Add')
 
     def validate_group_name(self, group_name):
@@ -51,12 +51,13 @@ class GroupOfCamerasForm(FlaskForm):
 
     
 class CamerasForm(FlaskForm):
-    owner = StringField('Owner', validators=[DataRequired(), Length(min=2, max=50)])
-    group_name = StringField('Group name', validators=[DataRequired(), Length(min=2, max=12)])
-    name = StringField('Name of camera', validators=[DataRequired(), Length(min=2, max=12)])
+    owner = StringField('Owner', validators=[DataRequired(), Length(min=1, max=50)])
+    group_name = StringField('Group name', validators=[DataRequired(), Length(min=1, max=12)])
+    name = StringField('Name of camera', validators=[DataRequired(), Length(min=1, max=12)])
     description = StringField('Description', validators=[Length(min=0, max=30)])
-    uri = StringField('URI', validators=[DataRequired(), Length(min=2, max=50)])
-    port = StringField('Port', validators=[DataRequired(), Length(min=2, max=12)])
-    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=12)])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=2, max=20)])
-    submit = SubmitField('Add')
+    uri = StringField('URI', validators=[DataRequired(), Length(min=2, max=100)])
+    refresh = RadioField('Update Frame', choices=[('yes', 'Yes'), ('no', 'No')], validators=[DataRequired()])
+    # port = StringField('Port', validators=[DataRequired(), Length(min=2, max=12)])
+    # username = StringField('Username', validators=[DataRequired(), Length(min=2, max=12)])
+    # password = PasswordField('Password', validators=[DataRequired(), Length(min=2, max=20)])
+    submit = SubmitField('Confirm')

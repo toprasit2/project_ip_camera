@@ -39,33 +39,7 @@
                         {% endif %}
                 </div>
             </div>
-            <h5 style="color: steelblue">Show in map:</h3>
-                <div class="input-field col s6">
-                    {{ form.c_lat.label(class="form-control-label", style="color: white") }}
-                    {% if form.c_lat.errors %}
-                        {{form.c_lat(class="validate  invalid",style="color: white") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.c_lat.errors %}
-                                <span class="red-text">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.c_lat(class="validate",style="color: white") }}
-                    {% endif %}
-                </div>
-                <div class="input-field col s6">
-                    {{ form.c_long.label(class="form-control-label", style="color: white") }}
-                    {% if form.c_long.errors %}
-                        {{form.c_long(class="validate  invalid",style="color: white") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.c_long.errors %}
-                                <span class="red-text">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.c_long(class="validate",style="color: white") }}
-                    {% endif %}
-                </div>
+            
             <div class="row">
                 {{ form.submit(class="btn light-blue lighten-1") }}
                 <a href="{{back}}" class="btn light-blue lighten-1">cancle</a>

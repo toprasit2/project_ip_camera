@@ -8,7 +8,7 @@ from datetime import datetime
 # def load_user(user_id):
 #     return Users.objects.get(id=user_id)
 
-class Users(db.Document, UserMixin):
+class MyUsers(db.Document, UserMixin):
     name = db.StringField(max_length = 20)
     email = db.EmailField(max_length = 50)
     picture = db.StringField()
@@ -28,8 +28,9 @@ class Cameras(db.Document):
     group_name = db.StringField(max_length = 50)
     name = db.StringField(max_length = 12)
     description = db.StringField(max_length = 50)
-    uri = db.StringField(max_length = 50)
-    port = db.StringField(max_length = 50)
-    username = db.StringField(max_length = 50)
-    password = db.StringField(max_length = 50)
+    uri = db.StringField(max_length = 200)
+    refresh = db.StringField(max_length = 10)
+    # port = db.StringField(max_length = 50)
+    # username = db.StringField(max_length = 50)
+    # password = db.StringField(max_length = 50)
     create_date = db.DateTimeField(default=datetime.utcnow)

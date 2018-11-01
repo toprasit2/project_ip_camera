@@ -311,10 +311,11 @@ def add_camera(group_name):
                 "owner":form.owner.data,
                 "name":form.name.data,
                 "description":form.description.data,
-                "uri":form.uri.data, 
-                "port":form.port.data, 
-                "password":form.password.data, 
-                "username":form.username.data
+                "uri":form.uri.data,
+                "refresh":form.refresh.data
+                # "port":form.port.data, 
+                # "password":form.password.data, 
+                # "username":form.username.data
             }
             # print(data)
             cameras =jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
@@ -324,6 +325,7 @@ def add_camera(group_name):
             flash(f'{cameras["name"]} added', 'green lighten-2')
             return redirect(back)
         return render_template("add_camera.html", title="Add Camera", form=form, user=user,back=back,group_name=group_name)
+
 
 @cache.cached(timeout=50)
 @app.route('/add_group', methods=['GET', 'POST'])
@@ -338,8 +340,8 @@ def add_group():
         data = {
             "owner":form.owner.data, 
             "group_name":form.group_name.data,
-            "c_lat":form.c_lat.data,
-            "c_long":form.c_long.data,
+            # "c_lat":form.c_lat.data,
+            # "c_long":form.c_long.data,
         }
         groups =jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
         r = requests.post("http://127.0.0.1:7000/api/group", data={'data':groups.decode('utf8')})
@@ -375,34 +377,60 @@ def delete_group(group_id):
     flash(f'{group_name} has deleted', 'green lighten-2')
     return  redirect(url_for('cameras'))
 
-@app.route('/edit_camera/<camera_id>', methods=['GET', 'POST'])
-def edit_camera(camera_id):
-    form = CamerasForm()
-    camera = Cameras.objects.get(id=camera_id)
-    form.owner.data = current_user.name
-    if not (form.name.data):
-        form.name.data = camera.name
-    if not (form.uri.data):
-        form.uri.data = camera.uri
-    if not (form.port.data):
-        form.port.data = camera.port
-    if not (form.username.data):
-        form.username.data = camera.username
-    if not (form.password.data):
-        form.password.data = camera.password
-    if not (form.group_name.data):
-        form.group_name.data = camera.group_name
-    if form.validate_on_submit():
-        Cameras.objects(id=camera.id).update(name=form.name.data, uri=form.uri.data, port=form.port.data, username=form.username.data, password=form.password.data)
-        group = GroupOfCameras.objects.get(group_name=camera.group_name)
-        return redirect(url_for('camera', group_id=group.id, camera_id=camera.id))
-    return render_template('add_camera.html', title="Edit Camera", form=form, camera=camera)
+@app.route('/edit_camera/<camera_id>/<group_name>', methods=['GET', 'POST'])
+def edit_camera(camera_id, group_name):
+    back = request.args.get('next')
+    if 'google_token' in session:
+        user = get_user()
+        if user == 'error':
+            return redirect(url_for('logout'))
+        form = CamerasForm()
+        form.owner.data = user['email']
+        form.group_name.data = group_name
+        if form.validate_on_submit():
+            data = { 
+                "camera_id":camera_id,
+                "group_name":form.group_name.data,
+                "owner":form.owner.data,
+                "name":form.name.data,
+                "description":form.description.data,
+                "uri":form.uri.data,
+                "refresh":form.refresh.data
+                # "port":form.port.data, 
+                # "password":form.password.data, 
+                # "username":form.username.data
+            }
+            print(data)
+            cameras =jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
+            r = requests.put("http://127.0.0.1:7000/api/camera", data={'data':cameras.decode('utf8')})
+            return redirect(back)
+        data = {
+            "camera_id":camera_id,
+        }
+        groups =jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
+        r = requests.get("http://127.0.0.1:7000/api/camera", data={'data':groups.decode('utf8')})
+        r_data = json.loads(r.text)['test'].encode('utf8')
+        cameras = jwt.decode(r_data, salt, algorithms=['HS256'])
+        cameras = cameras['data']
+        for camera in cameras:
+            form.group_name.data = camera['group_name']
+            form.owner.data = camera['owner']
+            form.name.data = camera['name']
+            form.description.data = camera['description']
+            form.uri.data = camera['uri']
+            form.refresh.data = camera['refresh']
+            camera_name = camera['name']
+        
+    return render_template('add_camera.html', title="Edit", form=form, user=user,back=back,camera_name=camera_name)
 
-@app.route('/delete_camera/<camera_id>', methods=['GET', 'POST'])
-def delete_camera(camera_id):
-    camera = Cameras.objects.get(id=camera_id)
-    group = GroupOfCameras.objects.get(group_name=camera.group_name)
-    camera_name=camera.name
-    camera.delete()
+@app.route('/delete_camera/<camera_id>/<camera_name>', methods=['GET', 'POST'])
+def delete_camera(camera_id, camera_name):
+    back = request.args.get('next')
+    data = {
+            "camera_id":camera_id,
+        }
+    groups =jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
+    r = requests.delete("http://127.0.0.1:7000/api/camera", data={'data':groups.decode('utf8')})
+    r_data = json.loads(r.text)['test'].encode('utf8')
     flash(f'{camera_name} has deleted', 'green lighten-2')
-    return  redirect(url_for('group_cameras', group_id=group.id))
+    return redirect(back)

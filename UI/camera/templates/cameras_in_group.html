@@ -44,28 +44,45 @@
                                 <div class="row">
                                     {% for c in cameras %}
                                     {% if display == '3x3' %}
-                                    <div class="col m4 uk-inline center" style="padding: 1px 1px 0px 0px" onload="updateImage();">
-                                        <!-- <video class="responsive-video" controls width="1920px" height="1080px" autoplay loop>
+                                    <div class="col m4 uk-inline center" style="padding: 1px 1px 0px 0px;" onload="updateImage();">
+                                        <!-- <video class="responsive-video" controls width="1440px" height="1080px" autoplay loop>
                                             <source src="https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4" type="video/mp4">
                                         </video> -->
-                                        <img src="http://61.90.186.189:8000/cgi-bin/faststream.jpg?stream=half&fps=15&rand=COUNTER#.W54ndWxTRTI.link" width="1920px" height="1080px" />
+                                        {% if c.refresh == 'yes' %}
+                                            <img class="ip_cam" src="{{c.uri}}" width="320px" height="240px" />
+                                        {% else %}
+                                            <img src="{{c.uri}}" width="320px" height="240px" />
+                                        {% endif %}
+                                        <div class="uk-overlay uk-light uk-position-top camera_name">
+                                            <a class="waves-effect waves-light modal-trigger right" href="{{url_for('edit_camera',camera_id=c.id,group_name=c.group_name,next=request.path)}}"><i class="material-icons">edit</i></a></p>
+                                        </div>
                                         <div class="uk-overlay uk-light uk-position-bottom camera_name">
-                                            <p class="center " style="font-size: 20px;"><a href="#">{{c.name}}</a></p>
+                                            <p class="center" style="font-size: 20px;"><a href="#">{{c.name}}</a><a class="waves-effect waves-light modal-trigger right" href="{{'#modal'+c.name}}"><i class="material-icons">delete</i></a></p>
+                                            <div id="{{'modal'+c.name}}" class="modal" >
+                                                <div class="modal-content" style="color: black">
+                                                  <h4 style="color: black">ลบกล้อง</h4>
+                                                  <p>คุณต้องการลบ {{c.name}} ใน {{group.group_name}} ใช่หรือไม่</p>
+                                                </div>
+                                                <div class="modal-footer" style="color: black">
+                                                    <a style="color: black" href="{{url_for('delete_camera',camera_id=c.id, camera_name=c.name, next=request.path)}}" class="waves-effect waves-green btn-flat">ยืนยัน</a>
+                                                    <a style="color: black" href="#!" class="modal-close waves-effect waves-green btn-flat">ปิด</a>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     {% elif display == '2x2' %}
                                     <div class="col m6 uk-inline center" style="padding: 1px 1px 0px 0px">
-                                        <!-- <video class="responsive-video" controls width="1920px" height="1080px" autoplay loop>
+                                        <video class="responsive-video" controls width="1440px" height="1080px" autoplay loop>
                                             <source src="https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4" type="video/mp4">
-                                        </video> -->
-                                        <img src="http://61.90.186.189:8000/cgi-bin/faststream.jpg?stream=half&fps=15&rand=COUNTER#.W54ndWxTRTI.link" width="1920px" height="1080px" />
+                                        </video>
+                                        <!-- <img src="http://61.90.186.189:8000/cgi-bin/faststream.jpg?stream=half&fps=15&rand=COUNTER#.W54ndWxTRTI.link" width="1440px" height="1080px" /> -->
                                         <div class="uk-overlay uk-light uk-position-bottom camera_name">
                                             <p class="center " style="font-size: 20px;"><a href="#">{{c.name}}</a></p>
                                         </div>
                                     </div>
                                     {% elif display == '4x4' %}
                                     <div class="col m3 uk-inline center" style="padding: 1px 1px 0px 0px">
-                                        <video class="responsive-video" controls width="1920px" height="1080px" autoplay loop>
+                                        <video class="responsive-video" controls width="1440px" height="1080px" autoplay loop>
                                             <source src="https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4" type="video/mp4">
                                         </video>
                                         <div class="uk-overlay uk-light uk-position-bottom camera_name">
@@ -73,8 +90,8 @@
                                         </div>
                                     </div>
                                     {% elif display == '1x1' %}
-                                    <div class="col m12 uk-inline center" style="padding: 25px 1px 0px 0px">
-                                        <video class="responsive-video" controls width="1920px" height="1080px" autoplay loop>
+                                    <div class="col m12 uk-inline center" style="padding: 10px 1px 0px 0px">
+                                        <video class="responsive-video" controls width="1440px" height="1080px" autoplay loop>
                                             <source src="https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4" type="video/mp4">
                                         </video>
                                         <div class="uk-overlay uk-light uk-position-bottom camera_name">
@@ -98,4 +115,34 @@
                 {% endfor %}
         </div>
 </div>
+{% endblock %}
+{% block script2 %}
+<script>
+    function refresh(node)
+    {
+    var times = 300; // gap in Milli Seconds;
+
+    (function startRefresh()
+    {
+        var address;
+        address = node.src.split('?')[0];
+        node.src = address+"?time="+new Date().getTime();
+
+        setTimeout(startRefresh,times);
+    })();
+    } 
+
+    window.onload = function()
+    {
+        var node = document.getElementsByClassName('ip_cam');
+        console.log(node)
+        var times = 300;
+        (function doRefresh(){
+            for (const n in node) {
+                refresh(node[n])
+            }
+            setTimeout(doRefresh,times);
+        })();
+    }
+</script>
 {% endblock %}

@@ -20,7 +20,11 @@
 {% block content %}
 
 <div class="container" >
-    <h2 style="color: steelblue">Add Camera in {{group_name}}</h2>
+    {% if camera_name %}
+    <h2 style="color: steelblue">{{title}} {{camera_name}}</h2>
+    {% else %}
+    <h2 style="color: steelblue">{{title}} in {{group_name}}</h2>
+    {% endif %}
     <div class="scroll4" style="overflow-y: auto; height: 80vh;">
     <form class="col s12" method="POST" action="">
         {{ form.hidden_tag() }}
@@ -51,7 +55,7 @@
                     {{ form.description(class="validate",style="color: white") }}
                 {% endif %}
             </div>
-            <div class="input-field col s6">
+            <div class="input-field col s12">
                 {{ form.uri.label(class="form-control-label", style="color: white") }}
                 {% if form.uri.errors %}
                     {{form.uri(class="validate  invalid",style="color: white") }}
@@ -64,45 +68,18 @@
                     {{ form.uri(class="validate",style="color: white") }}
                 {% endif %}
             </div>
-            <div class="input-field col s6">
-                {{ form.port.label(class="form-control-label", style="color: white") }}
-                {% if form.port.errors %}
-                    {{form.port(class="validate  invalid",style="color: white") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.port.errors %}
-                            <span class="red-text">{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    {{ form.port(class="validate",style="color: white") }}
-                {% endif %}
-            </div>
-            <div class="input-field col s6">
-                {{ form.username.label(class="form-control-label", style="color: white") }}
-                {% if form.username.errors %}
-                    {{form.username(class="validate  invalid",style="color: white") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.username.errors %}
-                            <span class="red-text">{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    {{ form.username(class="validate",style="color: white") }}
-                {% endif %}
-            </div>
-            <div class="input-field col s6">
-                {{ form.password.label(class="form-control-label", style="color: white") }}
-                {% if form.password.errors %}
-                    {{form.password(class="validate  invalid",style="color: white") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.password.errors %}
-                            <span class="red-text">{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    {{ form.password(class="validate",style="color: white") }}
-                {% endif %}
-            </div>
+            <div class="input-field col s12" style="color: white">
+                Update Frame
+                {% for subfield in form.refresh %}
+                    <p>
+                        <label>
+                            {{ subfield }}
+                            <span>{{ subfield.label }}</span>
+                        </label>
+                    </p>
+                {% endfor %}
+                    
+                </div>
             <div class="row">
                 {{ form.submit(class="btn light-blue lighten-1", style="width: 100px") }}
                 <a href="{{back}}" class="btn light-blue lighten-1">cancle</a>

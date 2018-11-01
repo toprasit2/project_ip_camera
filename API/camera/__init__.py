@@ -8,14 +8,14 @@ api = Api(app, prefix="/api")
 app.config['MONGODB_SETTINGS'] = {
     'db' : 'admin',
     'host' : '127.0.0.1',
-    'port' : 2277,
-    'username':'admin',
-    'password':'secure'
+    'port' : 1122,
+    'username':'',
+    'password':''
 }
 app.config['SECRET_KEY'] = '39380a3952f0ae125a699fd873560c51'
 db = MongoEngine(app)
 
-from camera.models import Users, GroupOfCameras, Cameras
+from camera.models import MyUsers, GroupOfCameras, Cameras
 
 salt = 'อิอิอุอิ'
 
@@ -39,7 +39,7 @@ class USER(Resource):
         p = request.form['data']
         data = p.encode('utf8')
         data = jwt.decode(data, salt, algorithms=['HS256'])
-        users = Users.objects(email=data['email']).first()
+        users = MyUsers.objects(email=data['email']).first()
         if users:
             data = {
                 'id': str(users.id),
@@ -54,9 +54,9 @@ class USER(Resource):
         p = request.form['data']
         data = p.encode('utf8')
         data = jwt.decode(data, salt, algorithms=['HS256'])
-        users = Users.objects(email=data['email']).first()
+        users = MyUsers.objects(email=data['email']).first()
         if not users:
-            user_add = Users(
+            user_add = MyUsers(
                 name=data['name'],
                 email=data['email'],
                 picture=data['picture']
@@ -69,6 +69,30 @@ class USER(Resource):
         return{'status':"200"}
 
 class CAMERA(Resource):
+    def get(self):
+        p = request.form['data']
+        data = p.encode('utf8')
+        data = jwt.decode(data, salt, algorithms=['HS256'])
+        encoded_jwt = jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
+        cameras = Cameras.objects(id = data['camera_id'])
+        data= []
+        for camera in cameras:
+            data.append(
+                { 
+                    "id" : str(camera.id),
+                    "group_name" : camera.group_name,
+                    "owner" : camera.owner,
+                    "name" : camera.name,
+                    "description" : camera.description,
+                    "uri" : camera.uri,
+                    "refresh": camera.refresh
+                }
+            )
+        data = {
+            "data":data
+        }
+        encoded_jwt = jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
+        return {"test": encoded_jwt.decode("utf-8")}
     def post(self):
         p = request.form['data']
         data = p.encode('utf8')
@@ -77,15 +101,49 @@ class CAMERA(Resource):
         cameras = Cameras(
                 group_name = group_name,
                 owner = data['owner'],
+                description = data['description'],
                 name = data['name'], 
-                uri = data['uri'], 
-                port = data['port'], 
-                password = data['group_name'], 
-                username = data['username']
+                uri = data['uri'],
+                refresh = data['refresh']
         )
         cameras.save()
         encoded_jwt = jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
         return {"test": encoded_jwt.decode("utf-8")}
+    def delete(self):
+        p = request.form['data']
+        data = p.encode('utf8')
+        data = jwt.decode(data, salt, algorithms=['HS256'])
+        camera_id = data['camera_id']
+        cameras = Cameras.objects(id = camera_id)
+        cameras.delete()
+        encoded_jwt = jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
+        return {"test": encoded_jwt.decode("utf-8")}
+    def put(self):
+        p = request.form['data']
+        data = p.encode('utf8')
+        data = jwt.decode(data, salt, algorithms=['HS256'])
+        camera = Cameras.objects(id = data['camera_id'])
+        print(camera)
+        camera.update(set__group_name=data['group_name'])
+        camera.update(set__owner=data['owner'])
+        camera.update(set__description=data['description'])
+        camera.update(set__name=data['name'])
+        camera.update(set__group_name=data['uri'])
+        camera.update(set__group_name=data['refresh'])
+        # if camera:
+        #     camera['group_name'] = data['group_name']
+        #     camera['owner'] = data['owner']
+        #     camera['description'] = data['description']
+        #     camera['name'] = data['name']
+        #     camera['uri'] = data['uri']
+        #     camera['refresh'] = data['refresh']
+        #     camera.save()
+        #     print('save')
+        #     if camera:
+        #         return{'status':"200"}
+        #     else:
+        #         return{'status':"404"}
+        return{'status':"200"}
 
 class CAMERAS(Resource):
     def get(self):
@@ -104,10 +162,8 @@ class CAMERAS(Resource):
                         "owner" : camera.owner,
                         "name" : camera.name,
                         "description" : camera.description,
-                        "uri" : camera.uri, 
-                        "port" : camera.port, 
-                        "password" : camera.password, 
-                        "username" : camera.username
+                        "uri" : camera.uri,
+                        "refresh": camera.refresh
                     }
                 )
             data = {
@@ -119,7 +175,7 @@ class CAMERAS(Resource):
             }
         encoded_jwt = jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
         return {"test": encoded_jwt.decode("utf-8")}
-
+    
 class CAMERAS_IN_GROUP(Resource):
     def get(self):
         p = request.form['data']
@@ -155,8 +211,6 @@ class CAMERAS_IN_GROUP(Resource):
         encoded_jwt = jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
         return {"test": encoded_jwt.decode("utf-8")}
 
-
-
 class GROUP(Resource):
     def get(self):
         p = request.form['data']
@@ -187,8 +241,8 @@ class GROUP(Resource):
         group = GroupOfCameras(
                 group_name = data['group_name'],
                 owner= data['owner'],
-                c_lat = data['c_lat'],
-                c_long = data['c_long']
+                # c_lat = data['c_lat'],
+                # c_long = data['c_long']
         )
         group.save()
         encoded_jwt = jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})

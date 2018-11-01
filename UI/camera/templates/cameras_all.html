@@ -26,9 +26,16 @@
                         {% for j in i['cameras'] %}
                             <li>
                                 <div class="uk-inline">
-                                    <video class="responsive-video" controls width="1080px" height="1920px">
+                                    <!-- <video class="responsive-video" controls width="1080px" height="1920px">
                                         <source src="https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4" type="video/mp4">
-                                    </video>
+                                    </video> -->
+                                    <div class="crop" style="width: 320px; height: 240px; overflow: hidden;">
+                                        {% if j.refresh == 'yes' %}
+                                        <img class="ip_cam" src="{{j.uri}}" width="1080px" height="1920px" />
+                                        {% else %}
+                                        <img src="{{j.uri}}" width="1080px" height="1920px" />
+                                        {% endif %}
+                                    </div>
                                     <div class="uk-overlay uk-light uk-position-bottom">
                                         <p class="center" style="font-size: 20px">{{j.name}}</p>
                                     </div>
@@ -55,4 +62,36 @@
     </div>
 </div>
 </div>
+{% endblock %}
+{% block script2 %}
+<script>
+    function refresh(node)
+    {
+    var times = 300; // gap in Milli Seconds;
+
+    (function startRefresh()
+    {
+        var address;
+        if(node.src.indexOf('?')>-1)
+        address = node.src.split('?')[0];
+        else 
+        address = node.src;
+        node.src = address+"?time="+new Date().getTime();
+
+        setTimeout(startRefresh,times);
+    })();
+    }
+
+    window.onload = function()
+    {
+        var node = document.getElementsByClassName('ip_cam');
+        var times = 500;
+        (function doRefresh(){
+            for (const n in node) {
+                refresh(node[n])
+            }
+            setTimeout(doRefresh,times);
+        })();
+    }
+</script>
 {% endblock %}

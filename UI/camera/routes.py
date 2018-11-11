@@ -49,7 +49,8 @@ def get_groups():
             data = {
                 'name': name,
                 'email': me.data['email'],
-                'picture': me.data['picture']
+                'picture': me.data['picture'],
+                'access_token': session['google_token'],
             }
         groups =jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
         r = requests.get("http://127.0.0.1:7000/api/groups", data={'data':groups.decode('utf8')})
@@ -119,7 +120,8 @@ def get_cameras():
             data = {
                 'name': name,
                 'email': me.data['email'],
-                'picture': me.data['picture']
+                'picture': me.data['picture'],
+                'access_token': session['google_token'],
             }
         cameras =jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
         r = requests.get("http://127.0.0.1:7000/api/cameras", data={'data':cameras.decode('utf8')})
@@ -146,7 +148,8 @@ def get_cameras_in_group(group):
                 'name': name,
                 'email': me.data['email'],
                 'picture': me.data['picture'],
-                'group_id': group
+                'group_id': group,
+                'access_token': session['google_token'],
             }
         cameras =jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
         r = requests.get("http://127.0.0.1:7000/api/cameras_in_group", data={'data':cameras.decode('utf8')})
@@ -173,7 +176,8 @@ def get_group(group):
                 'name': name,
                 'email': me.data['email'],
                 'picture': me.data['picture'],
-                'group_id': group
+                'group_id': group,
+                'access_token': session['google_token'],                
             }
         groups =jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
         r = requests.get("http://127.0.0.1:7000/api/group", data={'data':groups.decode('utf8')})
@@ -230,7 +234,7 @@ def authorized():
             request.args['error_reason'],
             request.args['error_description']
         )
-    session['google_token'] = (resp['access_token'], '')
+    session['google_token'] = (resp['access_token'], ' ')
     return redirect(url_for('add_user'))
 
 @google.tokengetter
@@ -340,6 +344,7 @@ def add_group():
         data = {
             "owner":form.owner.data, 
             "group_name":form.group_name.data,
+            'access_token': session['google_token'],    
             # "c_lat":form.c_lat.data,
             # "c_long":form.c_long.data,
         }
@@ -352,28 +357,41 @@ def add_group():
     return render_template('add_group.html', title="Cameras", form=form, user=user, back=back)
 
 
-@app.route('/edit_group/<group_id>', methods=['GET', 'POST'])
-def edit_group(group_id):
-    form = GroupOfCamerasForm()
-    group = GroupOfCameras.objects.get(id=group_id)
-    form.owner.data = current_user.name
-    if not (form.group_name.data):
-        form.group_name.data = group.group_name
-    if form.validate_on_submit():
-        Cameras.objects(group_name=group.group_name).update(group_name=form.group_name.data)
-        GroupOfCameras.objects(id=group.id).update(group_name=form.group_name.data)
-        group.reload()
-        return redirect(url_for('cameras'))
-    return render_template('add_group.html', title="Edit Group", form=form, group=group)
+@app.route('/edit_group/<group_id>/<group_name>', methods=['GET', 'POST'])
+def edit_group(group_id, group_name):
+    back = request.args.get('next')
+    if 'google_token' in session:
+        user = get_user()
+        if user == 'error':
+            return redirect(url_for('logout'))
+        form = GroupOfCamerasForm()
+        form.owner.data = user['email']
+        if form.validate_on_submit():
+            data = { 
+                "group_id":group_id,
+                "group_name":form.group_name.data,
+                "access_token":session['google_token'],
+                # "port":form.port.data, 
+                # "password":form.password.data, 
+                # "username":form.username.data
+            }
+            print(data)
+            group =jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
+            r = requests.put("http://127.0.0.1:7000/api/group", data={'data':group.decode('utf8')})
+            return redirect(back)
+        group = get_group(group_id)
+        form.group_name.data = group_name   
+    return render_template('edit_group.html', title="Edit", form=form, user=user,back=back,group_name=group_name)
 
-@app.route('/delete_group/<group_id>', methods=['GET', 'POST'])
-def delete_group(group_id):
-    group = GroupOfCameras.objects.get(id=group_id)
-    group_name = group.group_name
-    if Cameras.objects(group_name=group.group_name):
-         flash('Have a camera in this group', 'red lighten-2')
-         return redirect(url_for('cameras'))
-    group.delete()
+@app.route('/delete_group/<group_id>/<group_name>', methods=['GET', 'POST'])
+def delete_group(group_id, group_name):
+    back = request.args.get('next')
+    data = {
+            "group_id":group_id,
+    }
+    groups =jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
+    r = requests.delete("http://127.0.0.1:7000/api/group", data={'data':groups.decode('utf8')})
+    r_data = json.loads(r.text)['test'].encode('utf8')
     flash(f'{group_name} has deleted', 'green lighten-2')
     return  redirect(url_for('cameras'))
 
@@ -400,7 +418,7 @@ def edit_camera(camera_id, group_name):
                 # "password":form.password.data, 
                 # "username":form.username.data
             }
-            print(data)
+            #print(data)
             cameras =jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
             r = requests.put("http://127.0.0.1:7000/api/camera", data={'data':cameras.decode('utf8')})
             return redirect(back)

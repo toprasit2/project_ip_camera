@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
 from flask_mongoengine import MongoEngine
 import jwt
+import httplib2
+import json
 app = Flask(__name__)
 api = Api(app, prefix="/api")
 
@@ -15,9 +17,19 @@ app.config['MONGODB_SETTINGS'] = {
 app.config['SECRET_KEY'] = '39380a3952f0ae125a699fd873560c51'
 db = MongoEngine(app)
 
+from google.oauth2 import id_token
+from google.auth.transport import requests
+
+
 from camera.models import MyUsers, GroupOfCameras, Cameras
 
 salt = 'อิอิอุอิ'
+
+def check_token(access_token):
+    url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'% access_token)
+    h = httplib2.Http()
+    result = json.loads(h.request(url, 'GET')[1].decode('utf-8'))
+    return result
 
 class MY_NAME(Resource):
     def get(self):
@@ -128,8 +140,8 @@ class CAMERA(Resource):
         camera.update(set__owner=data['owner'])
         camera.update(set__description=data['description'])
         camera.update(set__name=data['name'])
-        camera.update(set__group_name=data['uri'])
-        camera.update(set__group_name=data['refresh'])
+        camera.update(set__uri=data['uri'])
+        camera.update(set__refresh=data['refresh'])
         # if camera:
         #     camera['group_name'] = data['group_name']
         #     camera['owner'] = data['owner']
@@ -151,7 +163,9 @@ class CAMERAS(Resource):
         data = p.encode('utf8')
         data = jwt.decode(data, salt, algorithms=['HS256'])
         encoded_jwt = jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
-        cameras = Cameras.objects(owner = data['email'])
+        access_token = data['access_token'][0]
+        user = check_token(access_token)
+        cameras = Cameras.objects(owner = user['email'])
         data= []
         if cameras != None:
             for camera in cameras:
@@ -181,10 +195,12 @@ class CAMERAS_IN_GROUP(Resource):
         p = request.form['data']
         data = p.encode('utf8')
         data = jwt.decode(data, salt, algorithms=['HS256'])
-        encoded_jwt = jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})    
+        encoded_jwt = jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'}) 
         group = GroupOfCameras.objects.get(id=data['group_id'])
         group_name = group.group_name
-        cameras = Cameras.objects(owner = data['email'], group_name=group_name)
+        access_token = data['access_token'][0]
+        user = check_token(access_token)
+        cameras = Cameras.objects(owner = user['email'], group_name=group_name)
         data= []
         if cameras != None:
             for camera in cameras:
@@ -217,10 +233,12 @@ class GROUP(Resource):
         data = p.encode('utf8')
         data = jwt.decode(data, salt, algorithms=['HS256'])
         encoded_jwt = jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
+        access_token = data['access_token'][0]
+        user = check_token(access_token)
         if 'group_id' in data:
             group = GroupOfCameras.objects.get(id=data['group_id'])
         else:
-            group = GroupOfCameras.objects(group_name=data['group_name']).first()
+            group = GroupOfCameras.objects(group_name=data['group_name'], owner=user['email']).first()
         if group != None:
             data = {
                 "owner":group.owner,
@@ -247,13 +265,38 @@ class GROUP(Resource):
         group.save()
         encoded_jwt = jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
         return {"test": encoded_jwt.decode("utf-8")}
+    def delete(self):
+        p = request.form['data']
+        data = p.encode('utf8')
+        data = jwt.decode(data, salt, algorithms=['HS256'])
+        group_id = data['group_id']
+        group = GroupOfCameras.objects(id = group_id)
+        group.delete()
+        encoded_jwt = jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
+        return {"test": encoded_jwt.decode("utf-8")}
+    def put(self):
+        p = request.form['data']
+        data = p.encode('utf8')
+        data = jwt.decode(data, salt, algorithms=['HS256'])
+        access_token = data['access_token'][0]
+        user = check_token(access_token)
+        group = GroupOfCameras.objects(id = data['group_id'], owner=user['email']).first()
+        print(group.group_name)
+        cameras = Cameras.objects(owner=user['email'], group_name=group['group_name'])
+        group.update(set__group_name=data['group_name'])
+        print(cameras)
+        for camera in cameras:
+            camera.update(set__group_name=data['group_name'])
+        return {'status':"200"}
 
 class GROUPS(Resource):
     def get(self):
         p = request.form['data']
         data = p.encode('utf8')
         data = jwt.decode(data, salt, algorithms=['HS256'])
-        groups = GroupOfCameras.objects(owner=data['email'])
+        access_token = data['access_token'][0]
+        user = check_token(access_token)
+        groups = GroupOfCameras.objects(owner=user['email'])
         data = []
         if groups:
             for group in groups:

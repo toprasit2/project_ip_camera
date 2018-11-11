@@ -54,13 +54,15 @@
                                     {% if group.count != 0 %}
                                         {{group.count}}
                                     {% else %}
-                                        <a class="waves-effect waves-light modal-trigger right" href="{{'#modal'+group.group_name}}"><i class="material-icons">edit</i></a>
-                                        <div id="{{'modal'+group.group_name}}" class="modal" >
+                                        <a class="waves-effect waves-light modal-trigger right" href="{{url_for('edit_group',group_id=group.id, group_name=group.group_name, next=request.path)}}"><i class="material-icons">edit</i></a>
+                                        <a class="waves-effect waves-light modal-trigger right" href="{{'#modald'+group.group_name}}"><i class="material-icons">delete   </i></a>
+
+                                        <div id="{{'modald'+group.group_name}}" class="modal" >
                                             <div class="modal-content" style="color: black">
-                                                <input value="{{group.group_name}}"/>
+                                                <h4>คุณต้องการลบ {{group.group_name}} ใช่หรือไม่</h4>
                                             </div>
                                             <div class="modal-footer" style="color: black">
-                                                <a style="color: black" href="#" class="waves-effect waves-green btn-flat">ยืนยัน</a>
+                                                <a style="color: black" href="{{url_for('delete_group',group_id=group.id, group_name=group.group_name, next=request.path)}}" class="waves-effect waves-green btn-flat">ยืนยัน</a>
                                                 <a style="color: black" href="#!" class="modal-close waves-effect waves-green btn-flat">ปิด</a>
                                             </div>
                                         </div>

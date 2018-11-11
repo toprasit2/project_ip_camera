@@ -11,22 +11,23 @@
         <div class="row">
             <!-- Group Name Feild input -->
             <div class="input-field col s12">
-                    {{ form.group_name.label(class="form-control-label") }}
+                    {{ form.group_name.label(class="form-control-label",style="color: white") }}
                     {% if form.group_name.errors %}
-                        {{form.group_name(class="validate  invalid") }}
+                        {{form.group_name(class="validate  invalid",style="color: white") }}
                         <div class="invalid-feedback">
                             {% for error in form.group_name.errors %}
                                 <span class="red-text">{{ error }}</span>
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.group_name(class="validate") }}
+                        {{ form.group_name(class="validate",style="color: white") }}
                     {% endif %}
             </div>
         </div>
         <!-- Submit Button -->
         <div class="row center">
-            {{ form.submit(class="btn light-blue lighten-1") }}
+            {{ form.submit(class="btn light-blue lighten-1",value="Edit") }}
+            <a href="{{back}}" class="btn light-blue lighten-1">cancle</a>
         </div>
     </form>
 </div>

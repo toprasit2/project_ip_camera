@@ -187,12 +187,14 @@
 <script>
     function refresh(node)
     {
-    var times = 300; // gap in Milli Seconds;
+    var times = 1000; // gap in Milli Seconds;
 
     (function startRefresh()
     {
         var address;
-        address = node.src.split('?')[0];
+        address = node.src.split('COUNTER')[0];
+        if(node.src.includes('?time'))
+            address = node.src.split('?time')[0];
         node.src = address+"?time="+new Date().getTime();
 
         setTimeout(startRefresh,times);

@@ -34,3 +34,38 @@ class Cameras(db.Document):
     # username = db.StringField(max_length = 50)
     # password = db.StringField(max_length = 50)
     create_date = db.DateTimeField(default=datetime.utcnow)
+    compute_id = db.StringField(max_length = 50,default="None")
+
+class CPUUsage(db.EmbeddedDocument):
+    used = db.FloatField(default=0)  # show in percent
+    used_per_cpu = db.ListField(db.FloatField())
+
+
+class MemoryUsage(db.EmbeddedDocument):
+    used = db.IntField(default=0)
+    free = db.IntField(default=0)
+    total = db.IntField(required=True, default=0)
+
+
+class DiskUsage(db.EmbeddedDocument):
+    used = db.IntField(default=0)
+    free = db.IntField(default=0)
+    percent = db.FloatField(default=0)  # show in percent
+    total = db.IntField(required=True, default=0)
+
+class ComputeNodes(db.Document):
+    name = db.StringField(max_length = 50)
+    owner = db.StringField(max_length = 50)
+    cpu = db.EmbeddedDocumentField(
+        'CPUUsage', required=True, default=CPUUsage())
+    memory = db.EmbeddedDocumentField(
+        'MemoryUsage', required=True, default=MemoryUsage())
+    disk = db.EmbeddedDocumentField(
+        'DiskUsage', required=True, default=DiskUsage())
+    create_date = db.DateTimeField(default=datetime.utcnow)
+    online = db.StringField(max_length = 50)
+
+class CameraInComputeNodes(db.Document):
+    camera_name = db.StringField(max_length = 50)
+    compute_name = db.StringField(max_length = 50)
+    owner = db.StringField(max_length = 50)

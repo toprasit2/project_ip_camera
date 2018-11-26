@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+{% block style %}
+<style>
+    .scroll4::-webkit-scrollbar {
+        width: 10px;
+    }
+    
+    .scroll4::-webkit-scrollbar-thumb {
+        background: rgb(48, 47, 47);
+        border-radius: 20px;
+    }
+
+    .scroll4::-webkit-scrollbar-track {
+        background: rgb(190, 189, 189);
+        border-radius: 5px;
+    }
+    .select-dropdown{
+        color: white
+    }
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="container" >
+    <h2 style="color: steelblue">Add Compute node</h2>
+    <div class="scroll4" style="overflow-y: auto; height: 90vh;">
+        <form class="col s12" method="POST" action="">
+            {{ form.hidden_tag() }}
+            <div class="row">
+                <div class="input-field col s12">
+                        {{ form.name.label(class="form-control-label",style="color: white") }}
+                        {% if form.name.errors %}
+                            {{form.name(class="validate  invalid",style="color: white") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.name.errors %}
+                                    <span class="red-text">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.name(class="validate",style="color: white") }}
+                        {% endif %}
+                </div>
+            </div>
+            <div class="input-field col s12" style="color: white">
+                <div>{{ form.cameras.label(style="color: white")}} {{ form.cameras(rows=3, multiple=True,style="color: white") }}</div>
+            </div>
+            
+            <div class="row">
+                {{ form.submit(class="btn light-blue lighten-1") }}
+                <a href="{{back}}" class="btn light-blue lighten-1">cancle</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

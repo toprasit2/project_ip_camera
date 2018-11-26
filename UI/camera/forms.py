@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, RadioField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, RadioField, SelectMultipleField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from flask_login import current_user
 import requests, jwt, json
@@ -45,7 +45,6 @@ class GroupOfCamerasForm(FlaskForm):
         r = requests.get("http://127.0.0.1:7000/api/group", data={'data':groups.decode('utf8')})
         r_data = json.loads(r.text)['test'].encode('utf8')
         groups = jwt.decode(r_data, salt, algorithms=['HS256'])
-        print(group_name.data)
         # group = GroupOfCameras.objects(group_name = group_name.data).first()
         if not "error" in groups:
             raise ValidationError('That group_name is taken. Please Choose a different.')
@@ -62,3 +61,21 @@ class CamerasForm(FlaskForm):
     # username = StringField('Username', validators=[DataRequired(), Length(min=2, max=12)])
     # password = PasswordField('Password', validators=[DataRequired(), Length(min=2, max=20)])
     submit = SubmitField('Confirm')
+
+class ComputeForm(FlaskForm):
+    name = StringField('Name of compute node', validators=[DataRequired(), Length(min=1, max=25)])
+    cameras = SelectMultipleField('Choose Camera', choices=[('yes', 'Yes'), ('no', 'No')], validators=[DataRequired()])
+    submit = SubmitField('Confirm')
+    def validate_name(self, name):
+        data = {
+            "name":name.data,
+            'access_token': session['google_token'],    
+        }
+        processors =jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
+        r = requests.get("http://127.0.0.1:7000/api/processors", data={'data':processors.decode('utf8')})
+        r_data = json.loads(r.text)['test'].encode('utf8')
+        processors = jwt.decode(r_data, salt, algorithms=['HS256'])
+        print(processors)
+        for c in processors['compute_node']:
+            if name.data == c['name']:
+                raise ValidationError('That name is taken. Please Choose a different.')

@@ -2,17 +2,37 @@ import os
 import secrets
 from flask import  render_template, url_for, flash, redirect, request, abort, session, jsonify, Markup
 from camera import app, bcrypt, google, cache
-from camera.forms import RegistrationForm, LoginForm, GroupOfCamerasForm, CamerasForm
+from camera.forms import RegistrationForm, LoginForm, GroupOfCamerasForm, CamerasForm, ComputeForm
 # from camera.models import Users, Cameras, GroupOfCameras
 # from flask_login import login_user, current_user, logout_user, login_required
 import requests
 import json
 import jwt
-
+from nokkhumclient import client
 
 
 salt = 'อิอิอุอิ'
 
+
+def nokkhum_client():        
+        host = 'nvr.coe.psu.ac.th'
+        port = 6543
+        
+        username = 'admin@nokkhum.local'
+        password = 'password'
+        
+        secure_connection = False
+        
+        # token = session['google_token']
+        # token = token[0]
+        token = None
+        nk_client = client.Client(username, 
+                                  password, 
+                                  host, 
+                                  port, 
+                                  secure_connection, 
+                                  token)
+        return nk_client
 
 def get_user():
     if 'google_token' in session:
@@ -190,6 +210,33 @@ def get_group(group):
         return groups
     return redirect(url_for('login'))
 
+def get_processors():
+    if 'google_token' in session:
+        me = google.get('userinfo')
+        if 'error' in me.data:
+            return redirect(url_for('logout'))
+        nk = nokkhum_client()
+        processors = nk.admin.processors.list()
+    return processors
+
+def get_compute_nodes():
+    if 'google_token' in session:
+        me = google.get('userinfo')
+        if 'error' in me.data:
+            return redirect(url_for('logout'))
+        nk = nokkhum_client()
+        compute_node = nk.admin.compute_nodes.list()
+    return compute_node
+
+def get_nodes(id):
+    if 'google_token' in session:
+        me = google.get('userinfo')
+        if 'error' in me.data:
+            return redirect(url_for('logout'))
+        nk = nokkhum_client()
+        compute_node = nk.admin.compute_nodes.get(id)
+    return compute_node
+
 @app.route('/')
 def index():
     if 'google_token' in session:
@@ -219,12 +266,10 @@ def home():
 def login():
     return google.authorize(callback=url_for('authorized', _external=True))
 
-
 @app.route('/logout')
 def logout():
     session.pop('google_token', None)
     return redirect(url_for('index'))
-
 
 @app.route('/login/authorized')
 def authorized():
@@ -234,6 +279,7 @@ def authorized():
             request.args['error_reason'],
             request.args['error_description']
         )
+    print(resp)
     session['google_token'] = (resp['access_token'], ' ')
     return redirect(url_for('add_user'))
 
@@ -409,17 +455,15 @@ def edit_camera(camera_id, group_name):
             data = { 
                 "camera_id":camera_id,
                 "group_name":form.group_name.data,
-                "owner":form.owner.data,
                 "name":form.name.data,
                 "description":form.description.data,
                 "uri":form.uri.data,
-                "refresh":form.refresh.data
-                # "port":form.port.data, 
-                # "password":form.password.data, 
-                # "username":form.username.data
+                "refresh":form.refresh.data,
+                "access_token":session['google_token'],
             }
             #print(data)
             cameras =jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
+            print(cameras)
             r = requests.put("http://127.0.0.1:7000/api/camera", data={'data':cameras.decode('utf8')})
             return redirect(back)
         data = {
@@ -452,3 +496,62 @@ def delete_camera(camera_id, camera_name):
     r_data = json.loads(r.text)['test'].encode('utf8')
     flash(f'{camera_name} has deleted', 'green lighten-2')
     return redirect(back)
+
+@app.route('/processors', methods=['GET', 'POST'])
+def processors():
+    if 'google_token' in session:
+        user = get_user()
+        if user == 'error':
+            return redirect(url_for('logout'))
+        data = {
+            'access_token': session['google_token'],
+        }
+        groups =jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
+        r = requests.get("http://127.0.0.1:7000/api/processors", data={'data':groups.decode('utf8')})
+        r_data = json.loads(r.text)['test'].encode('utf8')
+        data = jwt.decode(r_data, salt, algorithms=['HS256'])
+        print(data)
+        processors = data['processors']
+        compute_nodes = data['compute_node']
+        my_token = session['google_token'][0]
+        return render_template('processors.html', title="Processors",user=user, processors=processors, compute_nodes=compute_nodes, my_token=my_token)
+    return redirect(url_for('login'))
+
+@app.route('/add_compute', methods=['GET', 'POST'])
+def add_compute():
+    back = request.args.get('next')
+    user = get_user()
+    if user == 'error':
+        return redirect(url_for('logout'))
+    cameras = get_cameras()
+    form = ComputeForm()
+    choice = []
+    for c in cameras:
+        choice.append((c['id'],c['group_name']+' '+c['name']))
+    form.cameras.choices = choice
+    if form.validate_on_submit():
+        data = {
+            "name":form.name.data,
+            'access_token': session['google_token'],
+            "cameras":form.cameras.data
+        }
+        processors =jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
+        r = requests.post("http://127.0.0.1:7000/api/processors", data={'data':processors.decode('utf8')})
+        r_data = json.loads(r.text)['test'].encode('utf8')
+        processors = jwt.decode(r_data, salt, algorithms=['HS256'])
+        flash(f'Group {form.name.data} added', 'green lighten-2')
+        return redirect(back)
+    return render_template('add_compute.html', title="Cameras", form=form, user=user, back=back)
+
+
+@app.route('/get_processors', methods=['GET', 'POST'])
+def get_processors():
+    data = {
+        'access_token': session['google_token'],
+    }
+    print(session['google_token'])
+    groups =jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
+    r = requests.get("http://127.0.0.1:7000/api/processors", data={'data':groups.decode('utf8')})
+    r_data = json.loads(r.text)['test'].encode('utf8')
+    data = jwt.decode(r_data, salt, algorithms=['HS256'])
+    return json.dumps(data)

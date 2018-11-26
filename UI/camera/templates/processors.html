@@ -1,0 +1,232 @@
+{% extends "layout.html" %}
+{% block style %}
+<style>
+    #gMenu {
+        width: 13vw;
+    }
+    #groupMenu{
+        height: 52vh; 
+        width: 14vw; 
+        overflow-y: hidden;
+    }
+    #groupMenu:hover{
+        overflow-y: auto;
+    }
+
+    .scroll4::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    .scroll4::-webkit-scrollbar-thumb {
+        background:  rgb(190, 189, 189);
+        border-radius: 20px;
+    }
+
+    .scroll4::-webkit-scrollbar-track {
+        background:rgb(48, 47, 47);
+        border-radius: 5px;
+    }
+
+</style>
+{% endblock %}
+{% block content %}
+    
+    {% if user %}
+    <div class="row">
+        <div class="col m9">
+            <h3>Compute_node</h3>
+        </div>
+        <div class="col m3">
+            <h3>Processors</h3>
+        </div>
+    </div>
+    <div class="scroll4" style="height: 80vh; overflow-x: hidden; overflow-y: scroll;">
+    {% if processors != " " %}
+        
+        {% for n in compute_nodes %}
+        <p><a href="#{{n.id}}">{{n.name}}</a>
+        {% if n.online == True %}
+            <a>online: <i class="tiny material-icons green-text">brightness_1</i></a>
+        {% elif n.online == "True" %}
+            <a>online: <i class="tiny material-icons green-text">brightness_1</i></a>
+        {% else %}
+            <a>offline: <i class="tiny material-icons red-text">brightness_1</i></a>
+        {% endif %}
+        </p>
+        <hr  style="color: steelblue">
+        <div class="row">
+            <div class="col m9">
+                    
+                    
+                    <div class="row center">
+                        <div class="col m4">
+                            <!-- <canvas id={{'myChart'+n.name+'memory'}}></canvas> -->
+                            <h5 class="white-text">Memory used</h5>
+                            <h1 id={{'myChart'+n.name+'memory'}}  class="blue-text"></h1>
+                            <h5 id={{'myChart'+n.name+'memoryTotal'}} class="white-text"></h5>
+                            <p id={{'myChart'+n.name+'memoryFree'}} class="white-text"></p>
+                        </div>
+                        <div class="col m4">
+                            <!-- <canvas id={{'myChart'+n.name+'disk'}}></canvas> -->
+                            <h5 class="white-text">Disk used</h5>
+                            <h1 id={{'myChart'+n.name+'disk'}} class="blue-text" ></h1>
+                            <h5 id={{'myChart'+n.name+'diskTotal'}} class="white-text"></h5>
+                            <p id={{'myChart'+n.name+'diskFree'}} class="white-text"></p>
+                        </div>
+                        <div class="col m4">
+                            <!-- <canvas id={{'myChart'+n.name+'cpu'}}></canvas> -->
+                            <h5 class="white-text">CPU used</h5>
+                            <h1 id={{'myChart'+n.name+'cpu'}} class="blue-text" ></h1>
+                        </div>
+                    </div>
+            </div>
+            <div class="col m3 scroll4" style="height: 45vh; overflow-x: hidden; overflow-y: scroll;">
+                {% for p in processors %}
+                    {% if n.id == p.compute_id %}
+                    <p> <a href="#{{p.id}}">{{p.group_name}} {{p.name}}</a> </p>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+        
+    {% endif %}
+    <div class="center">
+        <a href="{{url_for('add_compute',next=request.path)}}" 
+            class="btn blue-grey btn-floating waves-effect waves-light">
+            <i class="material-icons">add</i>
+        </a>
+        <p class="white-text">ADD Compute_nodes</p>
+    </div>
+    </div>
+    {% else %}
+        <h5>Please Login !</h5>
+    {% endif %}
+
+{% endblock %}
+{% block script %}
+<script>
+    var getData = () => {
+        var data;
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                data = JSON.parse(this.response)
+                compute_nodes = data.compute_node
+                compute_nodes.forEach(function(n) {
+                    //memory
+                    var name = "myChart"+n.name+"memory"
+                    var ctx = document.getElementById(name);
+                    if (n.memory['total'] != 0 ){
+                        ctx.innerHTML = Math.round(n.memory['used']/n.memory['total']*100) + "%"
+                    }
+                    else{
+                        ctx.innerHTML = "0" + "%"
+                    }
+                    name = "myChart"+n.name+"memoryTotal"
+                    ctx = document.getElementById(name);
+                    ctx.innerHTML = Math.round(n.memory['used']/1024/1024/1024*10)/10 + " GB / " + Math.round(n.memory['total']/1024/1024/1024*10)/10 + " GB"
+                    name = "myChart"+n.name+"memoryFree"
+                    ctx = document.getElementById(name);
+                    ctx.innerHTML = "Free : " +  Math.round(n.memory['free']/1024/1024/1024*10)/10 + " GB"
+                    //disk
+                    name = "myChart"+n.name+"disk"
+                    var ctx = document.getElementById(name);
+                    if (n.disk['total'] != 0 ){
+                        ctx.innerHTML = Math.round(n.disk['used']/n.disk['total']*100) + "%"
+                    }
+                    else {
+                        ctx.innerHTML = "0" + "%"
+                    }
+                    name = "myChart"+n.name+"diskTotal"
+                    ctx = document.getElementById(name);
+                    ctx.innerHTML = Math.round(n.disk['used']/1024/1024/1024*10)/10 + " GB / " + Math.round(n.disk['total']/1024/1024/1024*10)/10 + " GB"
+                    name = "myChart"+n.name+"diskFree"
+                    ctx = document.getElementById(name);
+                    ctx.innerHTML = "Free : " +  Math.round(n.disk['free']/1024/1024/1024*10)/10 + " GB"
+                    //cpu
+                    name = "myChart"+n.name+"cpu"
+                    var ctx = document.getElementById(name);
+                    ctx.innerHTML = n.cpu['used'] + "%"
+                });
+            }
+        };
+        xhttp.open("GET", "http://127.0.0.1:5000/get_processors", true);
+        xhttp.send();
+    }
+    setInterval(()=>{getData()}, 3000)
+</script>
+{% if processors != " " %}
+{% for n in compute_nodes %}
+<script>
+    // var name = "myChart"+"{{n.name}}"+"memory"
+    // var ctx = document.getElementById(name);
+    
+    // var name = "myChart"+"{{n.name}}"+"memoryTotal"
+    // var ctx = document.getElementById(name);
+    // ctx.innerHTML = Math.round({{n.memory['used']/1024/1024/1024}}*10)/10 + " GB / " + Math.round({{n.memory['total']/1024/1024/1024}}*10)/10 + " GB"
+    // var name = "myChart"+"{{n.name}}"+"memoryFree"
+    // var ctx = document.getElementById(name);
+    // ctx.innerHTML = "Free : " +  Math.round({{n.memory['free']/1024/1024/1024}}*10)/10 + " GB"
+    // data = {
+    //     datasets: [{
+    //             data: [{{n.memory['used']}}, {{n.memory['free']}}],
+    //             backgroundColor: ['red','blue'],
+    //             borderColor:['red','blue']
+    //         }],
+    //     labels: [
+    //         'Memory Used',
+    //         'Memory Free'
+    //     ],
+    // };
+    // var myDoughnutChart = new Chart(ctx, {
+    //     type: 'pie',
+    //     data: data,
+    // });
+</script>
+<script>
+    // var name = "myChart"+"{{n.name}}"+"disk"
+    // var ctx = document.getElementById(name);
+    
+    // var name = "myChart"+"{{n.name}}"+"diskTotal"
+    // var ctx = document.getElementById(name);
+    // ctx.innerHTML = Math.round({{n.disk['used']/1024/1024/1024}}*10)/10 + " GB / " + Math.round({{n.disk['total']/1024/1024/1024}}*10)/10 + " GB"
+    // var name = "myChart"+"{{n.name}}"+"diskFree"
+    // var ctx = document.getElementById(name);
+    // ctx.innerHTML = "Free : " +  Math.round({{n.disk['free']/1024/1024/1024}}*10)/10 + " GB"
+    // data = {
+    //     datasets: [{
+    //             data: [Math.round({{n.disk['used']}}), Math.round({{n.disk['free']}})],
+    //             backgroundColor: ['red','blue'],
+    //             borderColor:['red','blue']
+    //         }],
+    //     labels: [
+    //         'Disk Used (%)',
+    //         'Disk Free (%)'
+    //     ],
+    // };
+    // var myDoughnutChart = new Chart(ctx, {
+    //     type: 'pie',
+    //     data: data,
+    // });
+</script>
+<script>
+    // var name = "myChart"+"{{n.name}}"+"cpu"
+    // var ctx = document.getElementById(name).getContext('2d');
+    // data = {
+    //     datasets: [{
+    //         backgroundColor: 'red',
+    //         label: 'Cpu used',
+    //         pointBackgroundColor: 'white',
+    //         data: {{n.cpu['used_per_cpu']}},
+    //     }],
+    // };
+    // var myDoughnutChart = new Chart(ctx, {
+    //     type: 'line',
+    //     data: data,
+        
+    // });
+</script>
+{% endfor %}
+{% endif %}
+{% endblock %}

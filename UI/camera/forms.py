@@ -66,16 +66,13 @@ class ComputeForm(FlaskForm):
     name = StringField('Name of compute node', validators=[DataRequired(), Length(min=1, max=25)])
     cameras = SelectMultipleField('Choose Camera', choices=[('yes', 'Yes'), ('no', 'No')], validators=[DataRequired()])
     submit = SubmitField('Confirm')
-    def validate_name(self, name):
-        data = {
-            "name":name.data,
-            'access_token': session['google_token'],    
-        }
-        processors =jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
-        r = requests.get("http://127.0.0.1:7000/api/processors", data={'data':processors.decode('utf8')})
-        r_data = json.loads(r.text)['test'].encode('utf8')
-        processors = jwt.decode(r_data, salt, algorithms=['HS256'])
-        print(processors)
-        for c in processors['compute_node']:
-            if name.data == c['name']:
-                raise ValidationError('That name is taken. Please Choose a different.')
+
+class SharewithUserForm(FlaskForm):
+    email = StringField('email')
+    permission_list = SelectMultipleField('Choose Permission', choices=[('yes', 'Yes'), ('no', 'No')])
+    submit = SubmitField('Confirm')
+
+class UserPermissionForm(FlaskForm):
+    email = StringField('email')
+    permission_list = SelectField('Choose Permission', choices=[('yes', 'Yes'), ('no', 'No')])
+    submit = SubmitField('Confirm')

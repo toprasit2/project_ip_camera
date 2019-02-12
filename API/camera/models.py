@@ -7,15 +7,17 @@ from datetime import datetime
 # @login_manager.user_loader
 # def load_user(user_id):
 #     return Users.objects.get(id=user_id)
+class SharedCameras(db.Document):
+    camera_id = db.StringField(max_length = 50)
+    shared = db.StringField(max_length = 50)
 
 class MyUsers(db.Document, UserMixin):
     name = db.StringField(max_length = 20)
     email = db.EmailField(max_length = 50)
     picture = db.StringField()
     permission = db.StringField(default='user')
-    def __repr__(self):
-        return f"User('{self.name}', '{self.email}'')"
-
+    access_date = db.DateTimeField(default=datetime.utcnow)
+    
 class GroupOfCameras(db.Document):
     group_name = db.StringField(max_length = 50)
     owner = db.StringField(max_length = 50)
@@ -35,17 +37,16 @@ class Cameras(db.Document):
     # password = db.StringField(max_length = 50)
     create_date = db.DateTimeField(default=datetime.utcnow)
     compute_id = db.StringField(max_length = 50,default="None")
+    shared = db.StringField(max_length = 50)
 
 class CPUUsage(db.EmbeddedDocument):
     used = db.FloatField(default=0)  # show in percent
     used_per_cpu = db.ListField(db.FloatField())
 
-
 class MemoryUsage(db.EmbeddedDocument):
     used = db.IntField(default=0)
     free = db.IntField(default=0)
     total = db.IntField(required=True, default=0)
-
 
 class DiskUsage(db.EmbeddedDocument):
     used = db.IntField(default=0)
@@ -69,3 +70,6 @@ class CameraInComputeNodes(db.Document):
     camera_name = db.StringField(max_length = 50)
     compute_name = db.StringField(max_length = 50)
     owner = db.StringField(max_length = 50)
+
+class PermissionList(db.Document):
+    permission = db.StringField(max_length = 20)

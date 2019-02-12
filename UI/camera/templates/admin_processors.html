@@ -1,0 +1,97 @@
+{% extends "layout.html" %}
+{% block style %}
+<style>
+    body{
+        scrollbar-face-color: #b46868;
+        scroll-behavior: smooth;
+    }
+    select{
+        display: inline-block;
+    }
+</style>
+{% endblock %}
+{% block content %}
+    <a href="{{back}}" class="waves-effect "><i class="large white-text material-icons">arrow_back</i></a>
+    {% if user.permission == 'admin' %}
+        <div class="container white" style="border-radius:10px;">
+            <div style="overflow-y: auto; height:80vh; width: 100%;border-radius:10px;" class="scroll4" >
+                <div style="width: 95%; margin-top: 20px;border-radius:10px; padding: 30px">  
+            <h1>Processors detail</h1>
+            <table id="table_id" class="display">
+                <thead>
+                  <tr>
+                      <th>Id</th>
+                      <th>Name</th>
+                      <th>Status</th>
+                      <th>Owner</th>
+                      <th>Create Date</th>
+                  </tr>
+                </thead>
+        
+                <tbody>
+                {% for processor in processors_all %}
+                  <tr class="myUL">
+                    <td>{{processor.id}}</td>
+                    <td >{{processor.name}}</td>
+                    {% if processor.online == 'True' %}
+                    <td ><i id={{processor.id}} class="material-icons green-text">brightness_1</i></td>
+                    {% else %}
+                    <td ><i id={{processor.id}} class="material-icons red-text">brightness_1</i></td>
+                    {% endif %}
+                    <td>{{processor.owner}}</td>
+                    <td>{{processor.create_date}}</td>
+                  </tr>
+                {% endfor %}
+                </tbody>
+              </table>
+        </div>
+    {% else %}
+        <h5>You are not Admin!</h5>
+    {% endif %}
+{% endblock %}
+{% block script %}
+    <script>
+        function myFunction() {
+            var input, filter, table, tr, td, i;
+            input = document.getElementById("myInput");
+            filter = input.value.toUpperCase();
+            tr = document.getElementsByClassName("myUL");
+            for (i = 0; i < tr.length; i++) {
+                a = tr[i].getElementsByTagName("td")[1];
+                txt = a.innerHTML
+                a2 = tr[i].getElementsByTagName("td")[2];
+                txt2 = a2.innerHTML
+                if (txt.toUpperCase().indexOf(filter) > -1 || txt2.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    </script>
+    <script>
+            var getData = () => {
+                var data;
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        data = JSON.parse(this.response)
+                        compute_nodes = data.compute_node
+                        compute_nodes.forEach(function(n) {
+                            //status
+                            var ctx = document.getElementById(n.id);
+                            ctx.classList.remove('green-text');
+                            ctx.classList.remove('red-text');
+                            if(n.online == 'True')
+                                ctx.classList.add('green-text');
+                            else
+                                ctx.classList.add('red-text');
+                        });
+                    }
+                };
+                xhttp.open("GET", "http://127.0.0.1:5000/admin_get_processors", true);
+                xhttp.send();
+            }
+            setInterval(()=>{getData()}, 3000)
+        </script>
+{% endblock %}

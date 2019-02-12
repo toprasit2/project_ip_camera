@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+{% block style %}
+<style>
+    body{
+        scrollbar-face-color: #b46868;
+        scroll-behavior: smooth;
+    }
+    select{
+        display: inline-block;
+    }
+</style>
+{% endblock %}
+{% block content %}
+    <a href="{{back}}" class="waves-effect "><i class="large white-text material-icons">arrow_back</i></a>
+    {% if user.permission == 'admin' %}
+        <div class="container white black-text" style="border-radius:10px;">
+            <div style="overflow-y: auto; height:80vh; width: 100%;border-radius:10px;" class="scroll4" >
+                <div style="width: 95%; border-radius:10px; padding: 30px">  
+            <h1>Cameras detail</h1>
+            <table id="table_id" class="display">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Owner</th>
+                    <th>Create Date</th>
+                </tr>
+            </thead>
+    
+            <tbody>
+            {% for camera in cameras_all %}
+                <tr class="myUL">
+                <td>{{camera.id}}</td>
+                <td ><a href="{{camera.uri}}" class="tooltipped" data-position="top" data-tooltip="{{camera.uri}}">{{camera.name}}</a></td>
+                <td>{{camera.owner}}</td>
+                <td>{{camera.create_date}}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            </table>
+        </div>
+    {% else %}
+        <h5>You are not Admin!</h5>
+    {% endif %}
+{% endblock %}
+{% block script %}
+    <script>
+        function myFunction() {
+            var input, filter, table, tr, td, i;
+            input = document.getElementById("myInput");
+            filter = input.value.toUpperCase();
+            tr = document.getElementsByClassName("myUL");
+            for (i = 0; i < tr.length; i++) {
+                a = tr[i].getElementsByTagName("td")[1];
+                txt = a.innerHTML
+                a2 = tr[i].getElementsByTagName("td")[2];
+                txt2 = a2.innerHTML
+                if (txt.toUpperCase().indexOf(filter) > -1 || txt2.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    </script>
+{% endblock %}

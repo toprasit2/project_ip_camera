@@ -44,15 +44,24 @@
     {% if processors != " " %}
         
         {% for n in compute_nodes %}
-        <p><a href="#{{n.id}}">{{n.name}}</a>
-        {% if n.online == True %}
-            <a>online: <i class="tiny material-icons green-text">brightness_1</i></a>
-        {% elif n.online == "True" %}
-            <a>online: <i class="tiny material-icons green-text">brightness_1</i></a>
-        {% else %}
-            <a>offline: <i class="tiny material-icons red-text">brightness_1</i></a>
-        {% endif %}
-        </p>
+        
+        <div class="row">
+            <div class="col m9">
+                <p><a href="#{{n.id}}">{{n.name}}</a>
+                    {% if n.online == True %}
+                        <a>online: <i id={{n.id}} class="tiny material-icons green-text">brightness_1</i></a>
+                    {% elif n.online == "True" %}
+                        <a>online: <i id={{n.id}} class="tiny material-icons green-text">brightness_1</i></a>
+                    {% else %}
+                        <a>offline: <i id={{n.id}} class="tiny material-icons red-text">brightness_1</i></a>
+                    {% endif %}
+                </p>
+            </div>
+            <div class="col m3">
+                <a class="waves-effect waves-light modal-trigger " href="{{url_for('edit_processor',processor_id=n.id, next=request.path)}}"><i class="material-icons">edit</i></a>
+                <a class="waves-effect waves-light modal-trigger" href="{{url_for('delete_processor',processor_id=n.id, processor_name=n.name, next=request.path)}}"><i class="material-icons">delete</i></a>
+            </div>
+        </div>
         <hr  style="color: steelblue">
         <div class="row">
             <div class="col m9">
@@ -114,6 +123,15 @@
                 data = JSON.parse(this.response)
                 compute_nodes = data.compute_node
                 compute_nodes.forEach(function(n) {
+                    //status
+                    var ctx = document.getElementById(n.id);
+                    ctx.classList.remove('green-text');
+                    ctx.classList.remove('red-text');
+                    if(n.online == 'True')
+                        ctx.classList.add('green-text');
+                    else
+                        ctx.classList.add('red-text');
+
                     //memory
                     var name = "myChart"+n.name+"memory"
                     var ctx = document.getElementById(name);

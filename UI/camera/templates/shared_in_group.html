@@ -1,0 +1,181 @@
+{% extends "cameras.html" %}
+{% block style_camera %}
+    <style>
+        .camera_name{
+            opacity: 0;
+        }
+        .camera_name:hover{
+            opacity: 1;
+        }
+    </style>
+{% endblock %}
+{% block menuhead %}
+<div class="center">
+    <div class="row">
+        <div class="col m4">
+        </div>
+        <div class="col m2">
+                <a href="{{'/shared_cameras/'+select+'/1x1'}}" class="btn">1x1</a>
+            </div>
+        <div class="col m2">
+            <a href="{{'/shared_cameras/'+select+'/2x2'}}" class="btn">2x2</a>
+        </div>
+        <div class="col m2">
+            <a href="{{'/shared_cameras/'+select+'/3x3'}}" class="btn">3x3</a>
+        </div>
+        <div class="col m2">
+            <a href="{{'/shared_cameras/'+select+'/4x4'}}" class="btn">4x4</a>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}
+{% block cameras %}
+<div style="padding-left: 2vw">
+    <div style="overflow-y: scroll; height:94vh; width: 100%" class="scroll4" >
+        <div class="row" style="width: 100%" >
+
+                            {% for cameras in shared_camera[select+'_cameras_'+display] %}
+                            <div class="col m12" id={{ loop.index0 }}>
+                                <div class="row">
+                                    {% for c in cameras %}
+                                    {% if display == '3x3' %}
+                                    <div class="col m4 uk-inline center" style="padding: 1px 1px 0px 0px;height:  30vh; overflow: hidden" onload="updateImage();">
+                                        <!-- <video class="responsive-video" controls width="1440px" height="1080px" autoplay loop>
+                                            <source src="https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4" type="video/mp4">
+                                        </video> -->
+                                        <img class="ip_cam" src="{{'/shared_camera/'+c.camera_id+'/time=0'}}" width="100%" height="100%" />
+                                        <div class="uk-overlay uk-light uk-position-top camera_name">
+                                            
+                                        </div>
+                                        <div class="uk-overlay uk-light uk-position-bottom camera_name">
+                                            <p class="center" style="font-size: 20px;"><a href="#">{{c.name}}</a><a class="waves-effect waves-light modal-trigger right" href="{{'#modal'+c.name}}"><i class="material-icons">delete</i></a></p>
+                                            <div id="{{'modal'+c.name}}" class="modal" >
+                                                <div class="modal-content" style="color: black">
+                                                  <h4 style="color: black">ลบกล้อง</h4>
+                                                  <p>คุณต้องการลบ {{c.name}} ใน ใช่หรือไม่</p>
+                                                </div>
+                                                <div class="modal-footer" style="color: black">
+                                                    <a style="color: black" href="#" class="waves-effect waves-green btn-flat">ยืนยัน</a>
+                                                    <a style="color: black" href="#!" class="modal-close waves-effect waves-green btn-flat">ปิด</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% elif display == '2x2' %}
+                                    <div class="col m6 uk-inline center" style="padding: 1px 1px 0px 0px;height: 45vh; overflow: hidden">
+                                        <!-- <video class="responsive-video" controls width="1440px" height="1080px" autoplay loop>
+                                            <source src="https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4" type="video/mp4">
+                                        </video> -->
+                                        <img class="ip_cam" src="{{'/shared_camera/'+c.camera_id}}" width="100%" height="100%" />
+                                        <div class="uk-overlay uk-light uk-position-top camera_name">
+                                            
+                                        </div>
+                                        <div class="uk-overlay uk-light uk-position-bottom camera_name">
+                                            <p class="center" style="font-size: 20px;"><a href="#">{{c.name}}</a><a class="waves-effect waves-light modal-trigger right" href="{{'#modal'+c.name}}"><i class="material-icons">delete</i></a></p>
+                                            <div id="{{'modal'+c.name}}" class="modal" >
+                                                <div class="modal-content" style="color: black">
+                                                  <h4 style="color: black">ลบกล้อง</h4>
+                                                  <p>คุณต้องการลบ {{c.name}} ใน ใช่หรือไม่</p>
+                                                </div>
+                                                <div class="modal-footer" style="color: black">
+                                                    <a style="color: black" href="#" class="waves-effect waves-green btn-flat">ยืนยัน</a>
+                                                    <a style="color: black" href="#!" class="modal-close waves-effect waves-green btn-flat">ปิด</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% elif display == '4x4' %}
+                                    <div class="col m3 uk-inline center" style="padding: 1px 1px 0px 0px; height: 22.5vh; overflow: hidden">
+                                        <!-- <video class="responsive-video" controls width="1440px" height="1080px" autoplay loop>
+                                            <source src="https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4" type="video/mp4">
+                                        </video> -->
+                                        <img class="ip_cam" src="{{'/shared_camera/'+c.camera_id}}" width="100%" height="100%" />
+                                        <div class="uk-overlay uk-light uk-position-top camera_name">
+                                            
+                                        </div>
+                                        <div class="uk-overlay uk-light uk-position-bottom camera_name">
+                                            <p class="center" style="font-size: 20px;"><a href="#">{{c.name}}</a><a class="waves-effect waves-light modal-trigger right" href="{{'#modal'+c.name}}"><i class="material-icons">delete</i></a></p>
+                                            <div id="{{'modal'+c.name}}" class="modal" >
+                                                <div class="modal-content" style="color: black">
+                                                  <h4 style="color: black">ลบกล้อง</h4>
+                                                  <p>คุณต้องการลบ {{c.name}} ใน ใช่หรือไม่</p>
+                                                </div>
+                                                <div class="modal-footer" style="color: black">
+                                                    <a style="color: black" href="#" class="waves-effect waves-green btn-flat">ยืนยัน</a>
+                                                    <a style="color: black" href="#!" class="modal-close waves-effect waves-green btn-flat">ปิด</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% elif display == '1x1' %}
+                                    <div class="col m12 uk-inline center" style="padding: 10px 1px 0px 0px; height: 90vh; overflow: hidden">
+                                        <!-- <video class="responsive-video" controls width="1440px" height="1080px" autoplay loop>
+                                            <source src="https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4" type="video/mp4">
+                                        </video> -->
+                                        <img class="ip_cam" src="{{'/shared_camera/'+c.camera_id}}" width="100%" height="100%" />
+                                        <div class="uk-overlay uk-light uk-position-top camera_name">
+                                            
+                                        </div>
+                                        <div class="uk-overlay uk-light uk-position-bottom camera_name">
+                                            <p class="center" style="font-size: 20px;"><a href="#">{{c.name}}</a><a class="waves-effect waves-light modal-trigger right" href="{{'#modal'+c.name}}"><i class="material-icons">delete</i></a></p>
+                                            <div id="{{'modal'+c.name}}" class="modal" >
+                                                <div class="modal-content" style="color: black">
+                                                  <h4 style="color: black">ลบกล้อง</h4>
+                                                  <p>คุณต้องการลบ {{c.name}} ใน ใช่หรือไม่</p>
+                                                </div>
+                                                <div class="modal-footer" style="color: black">
+                                                    <a style="color: black" href="#" class="waves-effect waves-green btn-flat">ยืนยัน</a>
+                                                    <a style="color: black" href="#!" class="modal-close waves-effect waves-green btn-flat">ปิด</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                            <div class="col bottom">
+                                <ul class="tabs blue-grey darken-3">
+                                    {% for i in range(0,shared_camera[select+'_display_'+display]) %}
+                                    <li class="tab col"><a href="#{{i}}">{{i+1}}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+        </div>
+        
+</div>
+{% endblock %}
+{% block script2 %}
+<script>
+    function refresh(node)
+    {
+    var times = 10000; // gap in Milli Seconds;
+
+    (function startRefresh()
+    {
+        var address;
+        address = node.src.split('COUNTER')[0];
+        if(node.src.includes('/time'))
+            address = node.src.split('/time')[0];
+        node.src = address+"/time="+new Date().getTime();
+
+        setTimeout(startRefresh,times);
+    })();
+    } 
+
+    window.onload = function()
+    {
+        var node = document.getElementsByClassName('ip_cam');
+        console.log(node)
+        var times = 5000;
+        (function doRefresh(){
+            for (const n in node) {
+                refresh(node[n])
+            }
+            setTimeout(doRefresh,times);
+        })();
+    }
+</script>
+{% endblock %}

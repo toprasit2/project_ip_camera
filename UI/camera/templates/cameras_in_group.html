@@ -51,12 +51,49 @@
                                             <source src="https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4" type="video/mp4">
                                         </video> -->
                                         {% if c.refresh == 'yes' %}
-                                            <img class="ip_cam" src="{{c.uri}}" width="480px" height="640px" />
+                                            <img class="ip_cam" src="{{c.uri}}" width="100%" height="100%" />
                                         {% else %}
-                                            <img src="{{c.uri}}" width="480px" height="640px" />
+                                            <img src="{{c.uri}}" width="100%" height="100%" />
                                         {% endif %}
                                         <div class="uk-overlay uk-light uk-position-top camera_name">
-                                            <a class="waves-effect waves-light modal-trigger right" href="{{url_for('edit_camera',camera_id=c.id,group_name=c.group_name,next=request.path)}}"><i class="material-icons">edit</i></a></p>
+                                            <p>
+                                            <a class="waves-effect waves-light modal-trigger right" href="{{url_for('edit_camera',camera_id=c.id,group_name=c.group_name,next=request.path)}}"><i class="material-icons">edit</i></a>
+                                            <a class="waves-effect waves-light modal-trigger left" href="{{'#sharemodal'+c.name}}"><i class="material-icons">share</i></a>
+                                                <div id="{{'sharemodal'+c.name}}" class="modal" >
+                                                    <form method="post" name="share_form" action="{{url_for('camera',group_id=group_id,display=display, camera_id=c.id,next=request.path)}}" >
+                                                    <div class="modal-content" style="color: black">
+                                                        
+                                                        <div>
+                                                            now share with :
+                                                            {% if c.shared != [] %} 
+                                                                {% for sh in c.shared %}
+                                                                    <div class="btn">{{sh}}<a class="waves-effect waves-light" href="{{url_for('delete_shared',camera_id=c.id,shared=sh,next=request.path)}}"><i class="material-icons">delete</i></a></div>
+                                                                {% endfor %}
+                                                            {% else %}
+                                                                <a class="btn">None</a>
+                                                            {% endif %}
+                                                            <p>Select Permission you want to shared</p>
+                                                            <div>{{ share_form.permission_list(multiple=True,style="color: black") }}</div>
+                                                        </div>
+                                                        <p>Enter email you want to shared with</p>
+                                                        {% if share_form.email.errors %}
+                                                            {{share_form.email(class="validate  invalid",style="color: black") }}
+                                                            <div class="invalid-feedback">
+                                                                {% for error in share_form.email.errors %}
+                                                                    <span class="red-text">{{ error }}</span>
+                                                                {% endfor %}
+                                                            </div>
+                                                        {% else %}
+                                                            {{ share_form.email(class="validate",style="color: black") }}
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="modal-footer" style="color: black">
+                                                        {{ share_form.submit(class="waves-effect waves-green btn") }}
+                                                        <a style="color: black" href="#" class="modal-close waves-effect waves-green btn-flat">ปิด</a>
+                                                    </div>
+                                                    </form>
+                                                </div>
+                                            </p>
                                         </div>
                                         <div class="uk-overlay uk-light uk-position-bottom camera_name">
                                             <p class="center" style="font-size: 20px;"><a href="#">{{c.name}}</a><a class="waves-effect waves-light modal-trigger right" href="{{'#modal'+c.name}}"><i class="material-icons">delete</i></a></p>
@@ -73,18 +110,54 @@
                                         </div>
                                     </div>
                                     {% elif display == '2x2' %}
-                                    <div class="col m6 uk-inline center" style="padding: 1px 1px 0px 0px;height: 45vh; overflow: hidden">
+                                    <div class="col m6 uk-inline center" style="padding: 1px 1px 0px 0px;height:  45vh; overflow: hidden" onload="updateImage();">
                                         <!-- <video class="responsive-video" controls width="1440px" height="1080px" autoplay loop>
                                             <source src="https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4" type="video/mp4">
                                         </video> -->
-                                        <!-- <img src="http://61.90.186.189:8000/cgi-bin/faststream.jpg?stream=half&fps=15&rand=COUNTER#.W54ndWxTRTI.link" width="1440px" height="1080px" /> -->
                                         {% if c.refresh == 'yes' %}
-                                            <img class="ip_cam" src="{{c.uri}}" width="720px" height="640px" />
+                                            <img class="ip_cam" src="{{c.uri}}" width="100%" height="100%" />
                                         {% else %}
-                                            <img src="{{c.uri}}" width="720px" height="640px" />
+                                            <img src="{{c.uri}}" width="100%" height="100%" />
                                         {% endif %}
                                         <div class="uk-overlay uk-light uk-position-top camera_name">
-                                            <a class="waves-effect waves-light modal-trigger right" href="{{url_for('edit_camera',camera_id=c.id,group_name=c.group_name,next=request.path)}}"><i class="material-icons">edit</i></a></p>
+                                            <p>
+                                            <a class="waves-effect waves-light modal-trigger right" href="{{url_for('edit_camera',camera_id=c.id,group_name=c.group_name,next=request.path)}}"><i class="material-icons">edit</i></a>
+                                            <a class="waves-effect waves-light modal-trigger left" href="{{'#sharemodal'+c.name}}"><i class="material-icons">share</i></a>
+                                                <div id="{{'sharemodal'+c.name}}" class="modal" >
+                                                    <form method="post" name="share_form" action="{{url_for('camera',group_id=group_id,display=display, camera_id=c.id,next=request.path)}}" >
+                                                    <div class="modal-content" style="color: black">
+                                                        
+                                                        <div>
+                                                            now share with :
+                                                            {% if c.shared != [] %} 
+                                                                {% for sh in c.shared %}
+                                                                    <div class="btn">{{sh}}<a class="waves-effect waves-light" href="{{url_for('delete_shared',camera_id=c.id,shared=sh,next=request.path)}}"><i class="material-icons">delete</i></a></div>
+                                                                {% endfor %}
+                                                            {% else %}
+                                                                <a class="btn">None</a>
+                                                            {% endif %}
+                                                            <p>Select Permission you want to shared</p>
+                                                            <div>{{ share_form.permission_list(multiple=True,style="color: black") }}</div>
+                                                        </div>
+                                                        <p>Enter email you want to shared with</p>
+                                                        {% if share_form.email.errors %}
+                                                            {{share_form.email(class="validate  invalid",style="color: black") }}
+                                                            <div class="invalid-feedback">
+                                                                {% for error in share_form.email.errors %}
+                                                                    <span class="red-text">{{ error }}</span>
+                                                                {% endfor %}
+                                                            </div>
+                                                        {% else %}
+                                                            {{ share_form.email(class="validate",style="color: black") }}
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="modal-footer" style="color: black">
+                                                        {{ share_form.submit(class="waves-effect waves-green btn") }}
+                                                        <a style="color: black" href="#" class="modal-close waves-effect waves-green btn-flat">ปิด</a>
+                                                    </div>
+                                                    </form>
+                                                </div>
+                                            </p>
                                         </div>
                                         <div class="uk-overlay uk-light uk-position-bottom camera_name">
                                             <p class="center" style="font-size: 20px;"><a href="#">{{c.name}}</a><a class="waves-effect waves-light modal-trigger right" href="{{'#modal'+c.name}}"><i class="material-icons">delete</i></a></p>
@@ -101,17 +174,54 @@
                                         </div>
                                     </div>
                                     {% elif display == '4x4' %}
-                                    <div class="col m3 uk-inline center" style="padding: 1px 1px 0px 0px; height: 22.5vh; overflow: hidden">
+                                    <div class="col m3 uk-inline center" style="padding: 1px 1px 0px 0px;height:  22.5vh; overflow: hidden" onload="updateImage();">
                                         <!-- <video class="responsive-video" controls width="1440px" height="1080px" autoplay loop>
                                             <source src="https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4" type="video/mp4">
                                         </video> -->
                                         {% if c.refresh == 'yes' %}
-                                            <img class="ip_cam" src="{{c.uri}}" width="320px" height="240px" />
+                                            <img class="ip_cam" src="{{c.uri}}" width="100%" height="100%" />
                                         {% else %}
-                                            <img src="{{c.uri}}" width="320px" height="240px" />
+                                            <img src="{{c.uri}}" width="100%" height="100%" />
                                         {% endif %}
                                         <div class="uk-overlay uk-light uk-position-top camera_name">
-                                            <a class="waves-effect waves-light modal-trigger right" href="{{url_for('edit_camera',camera_id=c.id,group_name=c.group_name,next=request.path)}}"><i class="material-icons">edit</i></a></p>
+                                            <p>
+                                            <a class="waves-effect waves-light modal-trigger right" href="{{url_for('edit_camera',camera_id=c.id,group_name=c.group_name,next=request.path)}}"><i class="material-icons">edit</i></a>
+                                            <a class="waves-effect waves-light modal-trigger left" href="{{'#sharemodal'+c.name}}"><i class="material-icons">share</i></a>
+                                                <div id="{{'sharemodal'+c.name}}" class="modal" >
+                                                    <form method="post" name="share_form" action="{{url_for('camera',group_id=group_id,display=display, camera_id=c.id,next=request.path)}}" >
+                                                    <div class="modal-content" style="color: black">
+                                                        
+                                                        <div>
+                                                            now share with :
+                                                            {% if c.shared != [] %} 
+                                                                {% for sh in c.shared %}
+                                                                    <div class="btn">{{sh}}<a class="waves-effect waves-light" href="{{url_for('delete_shared',camera_id=c.id,shared=sh,next=request.path)}}"><i class="material-icons">delete</i></a></div>
+                                                                {% endfor %}
+                                                            {% else %}
+                                                                <a class="btn">None</a>
+                                                            {% endif %}
+                                                            <p>Select Permission you want to shared</p>
+                                                            <div>{{ share_form.permission_list(multiple=True,style="color: black") }}</div>
+                                                        </div>
+                                                        <p>Enter email you want to shared with</p>
+                                                        {% if share_form.email.errors %}
+                                                            {{share_form.email(class="validate  invalid",style="color: black") }}
+                                                            <div class="invalid-feedback">
+                                                                {% for error in share_form.email.errors %}
+                                                                    <span class="red-text">{{ error }}</span>
+                                                                {% endfor %}
+                                                            </div>
+                                                        {% else %}
+                                                            {{ share_form.email(class="validate",style="color: black") }}
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="modal-footer" style="color: black">
+                                                        {{ share_form.submit(class="waves-effect waves-green btn") }}
+                                                        <a style="color: black" href="#" class="modal-close waves-effect waves-green btn-flat">ปิด</a>
+                                                    </div>
+                                                    </form>
+                                                </div>
+                                            </p>
                                         </div>
                                         <div class="uk-overlay uk-light uk-position-bottom camera_name">
                                             <p class="center" style="font-size: 20px;"><a href="#">{{c.name}}</a><a class="waves-effect waves-light modal-trigger right" href="{{'#modal'+c.name}}"><i class="material-icons">delete</i></a></p>
@@ -128,17 +238,54 @@
                                         </div>
                                     </div>
                                     {% elif display == '1x1' %}
-                                    <div class="col m12 uk-inline center" style="padding: 10px 1px 0px 0px; height: 90vh; overflow: hidden">
+                                    <div class="col m12 uk-inline center" style="padding: 1px 1px 0px 0px;height:  90vh; overflow: hidden" onload="updateImage();">
                                         <!-- <video class="responsive-video" controls width="1440px" height="1080px" autoplay loop>
                                             <source src="https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4" type="video/mp4">
                                         </video> -->
                                         {% if c.refresh == 'yes' %}
-                                            <img class="ip_cam" src="{{c.uri}}" width="1080px" height="1920px" />
+                                            <img class="ip_cam" src="{{c.uri}}" width="100%" height="100%" />
                                         {% else %}
-                                            <img src="{{c.uri}}" width="1080px" height="1920px" />
+                                            <img src="{{c.uri}}" width="100%" height="100%" />
                                         {% endif %}
                                         <div class="uk-overlay uk-light uk-position-top camera_name">
-                                            <a class="waves-effect waves-light modal-trigger right" href="{{url_for('edit_camera',camera_id=c.id,group_name=c.group_name,next=request.path)}}"><i class="material-icons">edit</i></a></p>
+                                            <p>
+                                            <a class="waves-effect waves-light modal-trigger right" href="{{url_for('edit_camera',camera_id=c.id,group_name=c.group_name,next=request.path)}}"><i class="material-icons">edit</i></a>
+                                            <a class="waves-effect waves-light modal-trigger left" href="{{'#sharemodal'+c.name}}"><i class="material-icons">share</i></a>
+                                                <div id="{{'sharemodal'+c.name}}" class="modal" >
+                                                    <form method="post" name="share_form" action="{{url_for('camera',group_id=group_id,display=display, camera_id=c.id,next=request.path)}}" >
+                                                    <div class="modal-content" style="color: black">
+                                                        
+                                                        <div>
+                                                            now share with :
+                                                            {% if c.shared != [] %} 
+                                                                {% for sh in c.shared %}
+                                                                    <div class="btn">{{sh}}<a class="waves-effect waves-light" href="{{url_for('delete_shared',camera_id=c.id,shared=sh,next=request.path)}}"><i class="material-icons">delete</i></a></div>
+                                                                {% endfor %}
+                                                            {% else %}
+                                                                <a class="btn">None</a>
+                                                            {% endif %}
+                                                            <p>Select Permission you want to shared</p>
+                                                            <div>{{ share_form.permission_list(multiple=True,style="color: black") }}</div>
+                                                        </div>
+                                                        <p>Enter email you want to shared with</p>
+                                                        {% if share_form.email.errors %}
+                                                            {{share_form.email(class="validate  invalid",style="color: black") }}
+                                                            <div class="invalid-feedback">
+                                                                {% for error in share_form.email.errors %}
+                                                                    <span class="red-text">{{ error }}</span>
+                                                                {% endfor %}
+                                                            </div>
+                                                        {% else %}
+                                                            {{ share_form.email(class="validate",style="color: black") }}
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="modal-footer" style="color: black">
+                                                        {{ share_form.submit(class="waves-effect waves-green btn") }}
+                                                        <a style="color: black" href="#" class="modal-close waves-effect waves-green btn-flat">ปิด</a>
+                                                    </div>
+                                                    </form>
+                                                </div>
+                                            </p>
                                         </div>
                                         <div class="uk-overlay uk-light uk-position-bottom camera_name">
                                             <p class="center" style="font-size: 20px;"><a href="#">{{c.name}}</a><a class="waves-effect waves-light modal-trigger right" href="{{'#modal'+c.name}}"><i class="material-icons">delete</i></a></p>

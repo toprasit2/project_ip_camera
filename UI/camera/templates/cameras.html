@@ -43,7 +43,30 @@
                                 All Groups
                             </li>
                         </a>
-                        
+                        {% if user['permission'] in permission_list %}
+                        <a href="{{'/shared_cameras/'+'permission'+'/3x3'}}" class="blue-text text-lighten-3" style="opacity: .8;">
+                            <li class="collection-item blue-grey darken-2 white-text z-depth-1 hoverable" style="height: 50px; padding-left: 2px; padding-right: 2px">
+                                <span><img src="https://cdn0.iconfinder.com/data/icons/thin-security/57/thin-441_webcam_camera_ip_security_surveillance-512.png" alt="Smiley face" width="35" height="35"></span>
+                                <span style="margin-left: 5px;">Shared with {{user.permission}}</span>
+                                <span  href="#!" class="right">
+                                    <span class="badge" style="margin-left: 0">
+                                        {{ shared_camera['count_permission'] }}
+                                    </span>
+                                </span>
+                            </li>
+                        </a>
+                        {% endif %}
+                        <a href="{{'/shared_cameras/'+'email'+'/3x3'}}" class="blue-text text-lighten-3" style="opacity: .8;">
+                            <li class="collection-item blue-grey darken-2 white-text z-depth-1 hoverable" style="height: 50px; padding-left: 2px; padding-right: 2px">
+                                <span><img src="https://cdn0.iconfinder.com/data/icons/thin-security/57/thin-441_webcam_camera_ip_security_surveillance-512.png" alt="Smiley face" width="35" height="35"></span>
+                                <span style="margin-left: 5px;">Shared with me</span>
+                                <span  href="#!" class="right">
+                                    <span class="badge" style="margin-left: 0">
+                                        {{ shared_camera['count_email'] }}
+                                    </span>
+                                </span>
+                            </li>
+                        </a>
                         {% for group in groups %}
                         <a href="{{'/cameras/'+group.id+'/3x3'}}">
                             <li class="collection-item blue-grey darken-2 white-text z-depth-1 hoverable" style="height: 50px; padding-left: 2px; padding-right: 2px">

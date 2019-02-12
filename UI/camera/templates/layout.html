@@ -11,8 +11,9 @@
     <!-- UIkit CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='uikit/css/uikit.min.css') }}" />
     <!-- Materialize CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='materialize/css/materialize.min.css') }}">
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='materialize/css/materialize.css') }}">
+    <!-- Data table -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
 
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
@@ -45,7 +46,7 @@
                     <li class="{{camera_status.active if camera_status}}"><a href="/cameras">Monitors</a></li>
                     <li class="{{processors.active if processors}}"><a href="/processors">Processors</a></li>
                     {% if user.permission == 'admin' %}
-                        <li><a href="#">Admin</a></li>
+                        <li><a href="/admin">Admin</a></li>
                     {% endif %}
                     <li style="margin-left: 25vw;">
                         {% block menuhead %}{% endblock %}
@@ -58,7 +59,7 @@
                     <li><a href="/cameras">Cameras</a></li>
                     <li><a href="/processors">Processors</a></li>
                     {% if user.permission == 'admin' %}
-                        <li><a href="#">Admin</a></li>
+                        <li><a href="/admin">Admin</a></li>
                     {% endif %}
                 </ul>
                 
@@ -94,11 +95,21 @@
     <!-- Chart JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
     <!-- Nav Menu function for mobile -->
+
+    <!-- Data table -->
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+
     <script>
         
         M.AutoInit();
         setInterval(() => {$('#message').fadeOut(1000)}, 1500);
         
+    </script>
+
+    <script>
+        $(document).ready( function () {
+            $('#table_id').DataTable();
+        } );
     </script>
     {% block script %}{% endblock %}
 </body>

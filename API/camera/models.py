@@ -16,12 +16,13 @@ class MyUsers(db.Document, UserMixin):
     email = db.EmailField(max_length = 50)
     picture = db.StringField()
     permission = db.StringField(default='user')
-    access_date = db.DateTimeField(default=datetime.utcnow)
+    access_date = db.DateTimeField(default=datetime.now())
+    last_access = db.DateTimeField(default=datetime.now())
     
 class GroupOfCameras(db.Document):
     group_name = db.StringField(max_length = 50)
     owner = db.StringField(max_length = 50)
-    create_date = db.DateTimeField(default=datetime.utcnow)
+    create_date = db.DateTimeField(default=datetime.now())
     c_lat = db.StringField(max_length = 50)
     c_long = db.StringField(max_length = 50)
 
@@ -35,9 +36,10 @@ class Cameras(db.Document):
     # port = db.StringField(max_length = 50)
     # username = db.StringField(max_length = 50)
     # password = db.StringField(max_length = 50)
-    create_date = db.DateTimeField(default=datetime.utcnow)
+    create_date = db.DateTimeField(default=datetime.now())
     compute_id = db.StringField(max_length = 50,default="None")
     shared = db.StringField(max_length = 50)
+    update_date = db.DateTimeField(default=datetime.now())
 
 class CPUUsage(db.EmbeddedDocument):
     used = db.FloatField(default=0)  # show in percent
@@ -63,8 +65,10 @@ class ComputeNodes(db.Document):
         'MemoryUsage', required=True, default=MemoryUsage())
     disk = db.EmbeddedDocumentField(
         'DiskUsage', required=True, default=DiskUsage())
-    create_date = db.DateTimeField(default=datetime.utcnow)
+    create_date = db.DateTimeField(default=datetime.now())
+    update_date = db.DateTimeField(default=datetime.now())
     online = db.StringField(max_length = 50)
+    key = db.StringField(max_length = 10)
 
 class CameraInComputeNodes(db.Document):
     camera_name = db.StringField(max_length = 50)

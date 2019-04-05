@@ -1,45 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
-<body>
-    
-</body>
-</html>{% extends "layout.html" %}
+{% extends "layout.html" %}
 {% block style %}
 <style>
     body{
         scrollbar-face-color: #b46868;
         scroll-behavior: smooth;
     }
-} 
 </style>
 {% endblock %}
 {% block content %}
 
     {% if user.permission == 'admin' %}
         <div class="container">
-            <div class="row" style="margin-top:10%">
-                <div class="col m2 white" style="border-radius:10px; margin: 5px;">
+            <div class="row center" style="margin-top:10%">
+                <div class="col m2 white" style="border-radius:10px; margin: 5px; ">
                     <a href="{{url_for('admin_cameras_detail',next=request.path)}}"><span><img src="https://cdn0.iconfinder.com/data/icons/thin-security/57/thin-441_webcam_camera_ip_security_surveillance-512.png" 
-                                  width="100%" height="100%"></span>
-                        <h5 class="center">ข้อมูลกล้อง</h5>
+                                  width="175px" height="175px"></span>
+                        <p style="font-size:20px; color:black" class="center">ข้อมูลกล้อง</p>
                     </a>
                 </div>
                 <div class="col m2 white" style="border-radius:10px; margin: 5px;">
-                    <a href="{{url_for('admin_users_detail',next=request.path)}}"><span><i class="material-icons black-text" style="font-size: 20vh">account_box</i></span>
-                        <h5 class="center">ข้อมูลผู้ใช้</h5>
+                    <a href="{{url_for('admin_users_detail',next=request.path)}}"><span><i class="material-icons black-text" style="font-size: 18vh">account_box</i></span>
+                        <p style="font-size:20px; color:black" class="center">ข้อมูลผู้ใช้</p>
                     </a>
                 </div>
                 <div class="col m2 white" style="border-radius:10px; margin: 5px;">
-                        <a href="{{url_for('admin_processors_detail',next=request.path)}}"><span><i class="material-icons black-text" style="font-size: 20vh">fiber_smart_record</i></span>
-                            <h5 class="center">ข้อมูลเครื่องบันทึก</h5>
-                        </a>
-                    </div>
+                    <a href="{{url_for('admin_processors_detail',next=request.path)}}"><span><i class="material-icons black-text" style="font-size: 18vh">fiber_smart_record</i></span>
+                        <p style="font-size:20px; color:black" class="center">ข้อมูลเครื่องบันทึก</p>
+                    </a>
+                </div>
             </div>
         </div>>
     {% else %}

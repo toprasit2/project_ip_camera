@@ -46,16 +46,28 @@
         {% for n in compute_nodes %}
         
         <div class="row">
-            <div class="col m9">
+            <div class="col m3">
                 <p><a href="#{{n.id}}">{{n.name}}</a>
                     {% if n.online == True %}
-                        <a>online: <i id={{n.id}} class="tiny material-icons green-text">brightness_1</i></a>
+                        <a>online: <i id={{'status'+n.id}} class="tiny material-icons green-text">brightness_1</i></a>
                     {% elif n.online == "True" %}
-                        <a>online: <i id={{n.id}} class="tiny material-icons green-text">brightness_1</i></a>
+                        <a>online: <i id={{'status'+n.id}} class="tiny material-icons green-text">brightness_1</i></a>
                     {% else %}
-                        <a>offline: <i id={{n.id}} class="tiny material-icons red-text">brightness_1</i></a>
+                        <a>offline: <i id={{'status'+n.id}} class="tiny material-icons red-text">brightness_1</i></a>
                     {% endif %}
                 </p>
+            </div>
+            <div class="col m6">
+                <p style="color:white">key: <span id="{{'key'+n.id}}">{{n.key}}</span> <a class="modal-trigger" href="#modal1"><i id={{n.id}} class="tiny material-icons">autorenew</i>reset-key</a></p>
+                <div id="modal1" class="modal">
+                        <div class="modal-content">
+                          <h4>ต้องการรีเซ็ตรหัสผ่าน {{ n.name }} ใช่หรือไม่</h4>
+                        </div>
+                        <div class="modal-footer">
+                          <a id="{{n.id}}" onclick="changeKey(this.id)" class="modal-close waves-effect waves-green btn-flat">ใช่</a>
+                          <a href="#!" class="modal-close waves-effect waves-green btn-flat">ไม่ใช่</a>
+                        </div>
+                      </div>
             </div>
             <div class="col m3">
                 <a class="waves-effect waves-light modal-trigger " href="{{url_for('edit_processor',processor_id=n.id, next=request.path)}}"><i class="material-icons">edit</i></a>
@@ -124,7 +136,8 @@
                 compute_nodes = data.compute_node
                 compute_nodes.forEach(function(n) {
                     //status
-                    var ctx = document.getElementById(n.id);
+                    var name = "status"+n.id
+                    var ctx = document.getElementById(name);
                     ctx.classList.remove('green-text');
                     ctx.classList.remove('red-text');
                     if(n.online == 'True')
@@ -171,79 +184,29 @@
         };
         xhttp.open("GET", "http://127.0.0.1:5000/get_processors", true);
         xhttp.send();
+        
     }
     setInterval(()=>{getData()}, 3000)
+
 </script>
 {% if processors != " " %}
 {% for n in compute_nodes %}
 <script>
-    // var name = "myChart"+"{{n.name}}"+"memory"
-    // var ctx = document.getElementById(name);
-    
-    // var name = "myChart"+"{{n.name}}"+"memoryTotal"
-    // var ctx = document.getElementById(name);
-    // ctx.innerHTML = Math.round({{n.memory['used']/1024/1024/1024}}*10)/10 + " GB / " + Math.round({{n.memory['total']/1024/1024/1024}}*10)/10 + " GB"
-    // var name = "myChart"+"{{n.name}}"+"memoryFree"
-    // var ctx = document.getElementById(name);
-    // ctx.innerHTML = "Free : " +  Math.round({{n.memory['free']/1024/1024/1024}}*10)/10 + " GB"
-    // data = {
-    //     datasets: [{
-    //             data: [{{n.memory['used']}}, {{n.memory['free']}}],
-    //             backgroundColor: ['red','blue'],
-    //             borderColor:['red','blue']
-    //         }],
-    //     labels: [
-    //         'Memory Used',
-    //         'Memory Free'
-    //     ],
-    // };
-    // var myDoughnutChart = new Chart(ctx, {
-    //     type: 'pie',
-    //     data: data,
-    // });
-</script>
-<script>
-    // var name = "myChart"+"{{n.name}}"+"disk"
-    // var ctx = document.getElementById(name);
-    
-    // var name = "myChart"+"{{n.name}}"+"diskTotal"
-    // var ctx = document.getElementById(name);
-    // ctx.innerHTML = Math.round({{n.disk['used']/1024/1024/1024}}*10)/10 + " GB / " + Math.round({{n.disk['total']/1024/1024/1024}}*10)/10 + " GB"
-    // var name = "myChart"+"{{n.name}}"+"diskFree"
-    // var ctx = document.getElementById(name);
-    // ctx.innerHTML = "Free : " +  Math.round({{n.disk['free']/1024/1024/1024}}*10)/10 + " GB"
-    // data = {
-    //     datasets: [{
-    //             data: [Math.round({{n.disk['used']}}), Math.round({{n.disk['free']}})],
-    //             backgroundColor: ['red','blue'],
-    //             borderColor:['red','blue']
-    //         }],
-    //     labels: [
-    //         'Disk Used (%)',
-    //         'Disk Free (%)'
-    //     ],
-    // };
-    // var myDoughnutChart = new Chart(ctx, {
-    //     type: 'pie',
-    //     data: data,
-    // });
-</script>
-<script>
-    // var name = "myChart"+"{{n.name}}"+"cpu"
-    // var ctx = document.getElementById(name).getContext('2d');
-    // data = {
-    //     datasets: [{
-    //         backgroundColor: 'red',
-    //         label: 'Cpu used',
-    //         pointBackgroundColor: 'white',
-    //         data: {{n.cpu['used_per_cpu']}},
-    //     }],
-    // };
-    // var myDoughnutChart = new Chart(ctx, {
-    //     type: 'line',
-    //     data: data,
-        
-    // });
+    var changeKey = (x) => {
+        var xhttp2 = new XMLHttpRequest();
+        xhttp2.open("GET", "http://127.0.0.1:5000/changeKey/"+x, true);
+        var mimeType = "text/plain";  
+        xhttp2.setRequestHeader('Content-Type', mimeType);
+        xhttp2.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                data = JSON.parse(this.response)
+                var ctx = document.getElementById('key'+data.id);
+                ctx.innerHTML = data.key
+
+            }
+        }
+        xhttp2.send();
+    }
 </script>
 {% endfor %}
 {% endif %}

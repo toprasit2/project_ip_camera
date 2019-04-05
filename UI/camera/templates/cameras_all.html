@@ -93,9 +93,9 @@
                                     </video> -->
                                     <div class="crop" style="width: 480px; height: 270px; overflow: hidden;">
                                         {% if j.refresh == 'yes' %}
-                                        <img class="ip_cam" src="{{j.uri}}" width="1080px" height="1920px" />
+                                        <img class="ip_cam" src="{{'shared_camera/'+j.id+'/0'}}" width="1080px" height="1920px" />
                                         {% else %}
-                                        <img src="{{j.uri}}" width="1080px" height="1920px" />
+                                        <img class="ip_cam" src="{{'shared_camera/'+j.id+'/0'}}" width="1080px" height="1920px" />
                                         {% endif %}
                                     </div>
                                     <div class="uk-overlay uk-light uk-position-bottom">

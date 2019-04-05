@@ -16,7 +16,7 @@
         <div class="container white" style="border-radius:10px;">
             <div style="overflow-y: auto; height:80vh; width: 100%;border-radius:10px;" class="scroll4" >
                 <div style="width: 95%; margin-top: 20px;border-radius:10px; padding: 30px">  
-            <h1>Processors detail</h1>
+            <h1>Processors Detail</h1>
             <table id="table_id" class="display">
                 <thead>
                   <tr>
@@ -24,7 +24,10 @@
                       <th>Name</th>
                       <th>Status</th>
                       <th>Owner</th>
-                      <th>Create Date</th>
+                      <th>RAM</th>
+                      <th>CPU</th>
+                      <th>Disks</th>
+                      <th>Last Update</th>
                   </tr>
                 </thead>
         
@@ -39,7 +42,10 @@
                     <td ><i id={{processor.id}} class="material-icons red-text">brightness_1</i></td>
                     {% endif %}
                     <td>{{processor.owner}}</td>
-                    <td>{{processor.create_date}}</td>
+                    <td id={{processor.id+"memory"}}>{{processor.memory_used_percent}}%</td>
+                    <td id={{processor.id+'cpu'}}>{{processor['cpu'].used}}%</td>
+                    <td id={{processor.id+'disk'}}>{{processor.disk_used_percent}}%</td>
+                    <td id={{processor.id+'time'}}>{{processor.update_date}}</td>
                   </tr>
                 {% endfor %}
                 </tbody>
@@ -51,47 +57,63 @@
 {% endblock %}
 {% block script %}
     <script>
-        function myFunction() {
-            var input, filter, table, tr, td, i;
-            input = document.getElementById("myInput");
-            filter = input.value.toUpperCase();
-            tr = document.getElementsByClassName("myUL");
-            for (i = 0; i < tr.length; i++) {
-                a = tr[i].getElementsByTagName("td")[1];
-                txt = a.innerHTML
-                a2 = tr[i].getElementsByTagName("td")[2];
-                txt2 = a2.innerHTML
-                if (txt.toUpperCase().indexOf(filter) > -1 || txt2.toUpperCase().indexOf(filter) > -1) {
-                    tr[i].style.display = "";
-                } else {
-                    tr[i].style.display = "none";
+        var getData = () => {
+            var data;
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    data = JSON.parse(this.response)
+                    compute_nodes = data.compute_node
+                    compute_nodes.forEach(function(n) {
+                        //status
+                        var ctx = document.getElementById(n.id);
+                        console.log(ctx)
+                        ctx.classList.remove('green-text');
+                        ctx.classList.remove('red-text');
+                        if(n.online == 'True')
+                            ctx.classList.add('green-text');
+                        else
+                            ctx.classList.add('red-text');
+                        //memory
+
+                        var name = n.id+"memory"
+                        var ctx = document.getElementById(name);
+                        console.log(ctx, name)
+                        if (n.memory['total'] != 0 ){
+                            ctx.innerHTML = Math.round(n.memory['used']/n.memory['total']*100) + "%"
+                        }
+                        else{
+                            ctx.innerHTML = "0" + "%"
+                        }
+
+                        //disk
+                        name = n.id+"disk"
+                        var ctx = document.getElementById(name);
+                        if (n.disk['total'] != 0 ){
+                            ctx.innerHTML = Math.round(n.disk['used']/n.disk['total']*100) + "%"
+                        }
+                        else {
+                            ctx.innerHTML = "0" + "%"
+                        }
+
+                        //cpu
+                        name = n.id+"cpu"
+                        var ctx = document.getElementById(name);
+                        ctx.innerHTML = n.cpu['used'] + "%"
+
+                        //update_time
+                        name = n.id+"time"
+                        console.log(n)
+                        var ctx = document.getElementById(name);
+                        ctx.innerHTML = n.update_date
+                    });
+
+                    
                 }
-            }
+            };
+            xhttp.open("GET", "http://127.0.0.1:5000/admin_get_processors", true);
+            xhttp.send();
         }
+        setInterval(()=>{getData()}, 3000)
     </script>
-    <script>
-            var getData = () => {
-                var data;
-                var xhttp = new XMLHttpRequest();
-                xhttp.onreadystatechange = function() {
-                    if (this.readyState == 4 && this.status == 200) {
-                        data = JSON.parse(this.response)
-                        compute_nodes = data.compute_node
-                        compute_nodes.forEach(function(n) {
-                            //status
-                            var ctx = document.getElementById(n.id);
-                            ctx.classList.remove('green-text');
-                            ctx.classList.remove('red-text');
-                            if(n.online == 'True')
-                                ctx.classList.add('green-text');
-                            else
-                                ctx.classList.add('red-text');
-                        });
-                    }
-                };
-                xhttp.open("GET", "http://127.0.0.1:5000/admin_get_processors", true);
-                xhttp.send();
-            }
-            setInterval(()=>{getData()}, 3000)
-        </script>
 {% endblock %}

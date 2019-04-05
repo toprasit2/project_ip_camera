@@ -16,7 +16,7 @@
         <div class="container white" style="border-radius:10px;">
             <div style="overflow-y: auto; height:80vh; width: 100%;border-radius:10px;" class="scroll4" >
                 <div style="width: 95%; margin-top: 20px;border-radius:10px; padding: 30px">  
-            <h1>Users detail</h1>
+            <h1>Users Detail</h1>
             <table id="table_id" class="display">
                 <thead>
                   <tr>
@@ -24,26 +24,30 @@
                       <th>Email</th>
                       <th>Permission</th>
                       <th></th>
-                      <th>Access Date</th>
+                      <th>Last Online</th>
                   </tr>
                 </thead>
         
                 <tbody>
-                {% for user in users_all %}
-                  <tr class="myUL">
-                    <td><img src="{{user.picture}}" alt="" style="width:50px; height:50px; border-radius: 50px"></td>
-                    <td>{{user.email}}</td>
-                    <td>{{user.permission}}</td>
-                    <td><a href={{"#modal"+ user.id}} class="modal-trigger"><i class="material-icons">edit</i></a></td>
-                    <td>{{user.access_date}}</td>
+                {% for use in users_all %}
                     
+                  <tr class="myUL">
+                    <td><img src="{{use.picture}}" alt="" style="width:50px; height:50px; border-radius: 50px"></td>
+                    <td>{{use.email}}</td>
+                    <td>{{use.permission}}</td>
+                    {% if use.email == user.email %}
+                    <td></td>
+                    {% else %}
+                    <td><a href={{"#modal"+ use.id}} class="modal-trigger"><i class="material-icons">edit</i></a></td>
+                    {% endif %}
+                    <td>{{use.last_access}}</td>
                   </tr>
                     
                 {% endfor %}
                 </tbody>
               </table>
               {% for user in users_all %}
-                <div id={{"modal"+ user.id}} class="modal">
+                <div id={{"modal"+ user.id}} class="modal"  style="padding-bottom:25px">
                         <form method="post" name="user_form" action="{{url_for('admin_users_detail', user_id=user.id, next=request.path)}}">
                         <div class="modal-content">
                             <p>Email : {{user.email}}</p>

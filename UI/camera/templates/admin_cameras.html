@@ -16,14 +16,15 @@
         <div class="container white black-text" style="border-radius:10px;">
             <div style="overflow-y: auto; height:80vh; width: 100%;border-radius:10px;" class="scroll4" >
                 <div style="width: 95%; border-radius:10px; padding: 30px">  
-            <h1>Cameras detail</h1>
+            <h1>Cameras Detail</h1>
             <table id="table_id" class="display">
             <thead>
                 <tr>
                     <th>Id</th>
+                    <th>Sample</th>
                     <th>Name</th>
                     <th>Owner</th>
-                    <th>Create Date</th>
+                    <th>Last Update</th>
                 </tr>
             </thead>
     
@@ -31,9 +32,10 @@
             {% for camera in cameras_all %}
                 <tr class="myUL">
                 <td>{{camera.id}}</td>
-                <td ><a href="{{camera.uri}}" class="tooltipped" data-position="top" data-tooltip="{{camera.uri}}">{{camera.name}}</a></td>
+                <td><img src="{{'/shared_camera/'+camera.id+'/time=0'}}" style="width:128px; height:72px"/></td>
+                <td ><a href="{{'/shared_camera/'+camera.id+'/time=0'}}" class="tooltipped" data-position="top" data-tooltip="{{camera.uri}}">{{camera.name}}</a></td>
                 <td>{{camera.owner}}</td>
-                <td>{{camera.create_date}}</td>
+                <td>{{camera.update_date}}</td>
                 </tr>
             {% endfor %}
             </tbody>

@@ -678,6 +678,18 @@ def get_processors():
     data = jwt.decode(r_data, salt, algorithms=['HS256'])
     return json.dumps(data)
 
+@app.route('/changeKey/<id>', methods=['GET'])
+def changeKey(id):
+    data = {
+        "id" : id
+    }
+    # print(session['google_token'])
+    groups =jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
+    r = requests.post("http://127.0.0.1:7000/api/processor", data={'data':groups.decode('utf8')})
+    r_data = json.loads(r.text)['test'].encode('utf8')
+    data = jwt.decode(r_data, salt, algorithms=['HS256'])
+    return json.dumps(data)
+
 @app.route('/edit_processor/<processor_id>', methods=['GET', 'POST'])
 def edit_processor(processor_id):
     back = request.args.get('next')
@@ -732,9 +744,6 @@ def delete_processor(processor_id, processor_name):
 @app.route('/shared_camera/<camera_id>/<time>', methods=['GET'])
 def shared_camera(camera_id,time):
     if 'google_token' in session:
-        user = get_user()
-        if user == 'error':
-            return redirect(url_for('logout'))
         data = {
             'camera_id': camera_id,
             'access_token': session['google_token'],
@@ -745,7 +754,8 @@ def shared_camera(camera_id,time):
         shared_camera = jwt.decode(r_data, salt, algorithms=['HS256'])
         return Response(gen(VideoCamera(uri=shared_camera['camera_uri'])),
                 mimetype='multipart/x-mixed-replace; boundary=frame')
-
+    return redirect(url_for('logout'))
+    
 @app.route('/shared_cameras/<select>/<display>', methods=['GET', 'POST'])
 def shared_cameras(select, display):
     back = request.args.get('next')
@@ -822,7 +832,7 @@ def admin_cameras_detail():
         cameras_all = jwt.decode(r_data, salt, algorithms=['HS256'])
         cameras_all=cameras_all['data']
         count_cameras_all = len(cameras_all)
-        return render_template('admin_cameras.html', title="Admin Home", user=user, back=back, cameras_all=cameras_all, count_cameras_all=count_cameras_all)
+        return render_template('admin_cameras.html', title="Admin Cameras", user=user, back=back, cameras_all=cameras_all, count_cameras_all=count_cameras_all)
     return redirect(url_for('index'))
 
 @app.route('/admin/users_detail', methods=['GET', 'POST'])
@@ -862,7 +872,7 @@ def admin_users_detail():
             choice.append((c,c))
         user_form.permission_list.choices = choice
 
-        return render_template('admin_users.html', title="Admin Home", user=user, back=back, users_all=users_all, user_form=user_form)
+        return render_template('admin_users.html', title="Admin Users", user=user, back=back, users_all=users_all, user_form=user_form)
     return redirect(url_for('index'))
 
 @app.route('/admin/processors_detail', methods=['GET'])
@@ -879,7 +889,7 @@ def admin_processors_detail():
         r_data = json.loads(r.text)['test'].encode('utf8')
         processors_all = jwt.decode(r_data, salt, algorithms=['HS256'])
         processors_all=processors_all['data']
-        return render_template('admin_processors.html', title="Admin Home", user=user, back=back, processors_all=processors_all)
+        return render_template('admin_processors.html', title="Admin Compute Node", user=user, back=back, processors_all=processors_all)
     return redirect(url_for('index'))
 
 @app.route('/admin_get_processors', methods=['GET', 'POST'])

@@ -10,6 +10,10 @@ import base64
 import numpy as np
 #processor data
 from nokkhumclient import client
+from datetime import datetime
+
+import random
+import string
 
 app = Flask(__name__)
 api = Api(app, prefix="/api")
@@ -79,13 +83,15 @@ class USER(Resource):
         data = p.encode('utf8')
         data = jwt.decode(data, salt, algorithms=['HS256'])
         users = MyUsers.objects(email=data['email']).first()
+        users.update(set__last_access=datetime.now())
         if users:
             data = {
                 'id': str(users.id),
                 'name' : users.name,
                 'email' : users.email,
                 'picture' : users.picture,
-                'permission' : users.permission
+                'permission' : users.permission,
+                'last_access': str(users.last_access),
             }
         encoded_jwt = jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
         return {"test": encoded_jwt.decode("utf-8")}
@@ -171,6 +177,7 @@ class CAMERA(Resource):
         camera.update(set__name=data['name'])
         camera.update(set__uri=data['uri'])
         camera.update(set__refresh=data['refresh'])
+        camera.update(set__update_date=datetime.now())
         # if camera:
         #     camera['group_name'] = data['group_name']
         #     camera['owner'] = data['owner']
@@ -370,12 +377,28 @@ class PROCESSOR(Resource):
             for p in processor:
                 data = {
                     "name":p.name,
-                    "id":str(p.id)
+                    "id":str(p.id),
+                    "key":p.key,
                 }
         else:
             data = {
                 'error':'error'
             }
+        encoded_jwt = jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
+        return {"test": encoded_jwt.decode("utf-8")}
+    def post(self):
+        p = request.form['data']
+        data = p.encode('utf8')
+        data = jwt.decode(data, salt, algorithms=['HS256'])
+        id = data['id']
+        lettersAndDigits = string.ascii_letters + string.digits
+        key = ''.join(random.choice(lettersAndDigits) for i in range(10))
+        compute = ComputeNodes.objects(id=id).first()
+        compute.update(set__key=key)
+        data = {
+            "key":key,
+            "id":id
+        }
         encoded_jwt = jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
         return {"test": encoded_jwt.decode("utf-8")}
     def put(self):
@@ -498,7 +521,7 @@ class PROCESSORS(Resource):
                     "name":p.name,
                     "id":str(p.id),
                     "compute_id":p.compute_id,
-                    "group_name":p.group_name
+                    "group_name":p.group_name,
                 })
             nodes = ComputeNodes.objects(owner=user['email'])
             c_node = []
@@ -507,6 +530,7 @@ class PROCESSORS(Resource):
                     "name": c.name,
                     "id": str(c.id),
                     "online":c.online,
+                    "key":c.key,
                     "memory":{
                         "used":c.memory.used,
                         "free":c.memory.free,
@@ -539,9 +563,12 @@ class PROCESSORS(Resource):
         data = jwt.decode(data, salt, algorithms=['HS256'])
         access_token = data['access_token'][0]
         user = check_token(access_token)
+        lettersAndDigits = string.ascii_letters + string.digits
+        key = ''.join(random.choice(lettersAndDigits) for i in range(10))
         compute = ComputeNodes(
             name = data['name'],
-            owner = user['email']
+            owner = user['email'],
+            key = key
         )
         compute.save()
         compute = ComputeNodes.objects(owner=user['email'], name=data['name']).first()
@@ -551,7 +578,7 @@ class PROCESSORS(Resource):
             camera.update(set__compute_id=com_id)
         encoded_jwt = jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
         return {"test": encoded_jwt.decode("utf-8")}
-
+        
 class PROCESSOR_RESOURCE(Resource):
     def put(self):
         p = request.form['data']
@@ -559,9 +586,10 @@ class PROCESSOR_RESOURCE(Resource):
         data = jwt.decode(data, salt, algorithms=['HS256'])
         name = data['name']
         owner = data['owner']
-        compute = ComputeNodes.objects(name = name, owner= owner).first()
-        print(compute)
+        key = data['key']
+        compute = ComputeNodes.objects(name = name, owner= owner, key=key).first()
         compute.update(set__online=data['online'])
+        compute.update(set__update_date=datetime.now())
         compute.update(set__memory__used=data['memory']['used'])
         compute.update(set__memory__free=data['memory']['free'])
         compute.update(set__memory__total=data['memory']['total'])
@@ -599,8 +627,6 @@ class TEST(Resource):
         data = p.encode('utf8')
         data = jwt.decode(data, salt, algorithms=['HS256'])
         encoded_jwt = jwt.encode( data,  salt, algorithm='HS256', headers={'message': 'OK'})
-        access_token = data['access_token'][0]
-        user = check_token(access_token)
         cameras = Cameras.objects(id =data['camera_id']).first()
         data = {
             'camera_uri':cameras.uri
@@ -726,7 +752,8 @@ class ADMIN_USER(Resource):
                         'email' : user.email,
                         'picture' : user.picture,
                         'permission' : user.permission,
-                        'access_date' : str(user.access_date)
+                        'access_date' : str(user.access_date),
+                        'last_access': str(user.last_access)
                     }
                 )
             data = {
@@ -769,7 +796,8 @@ class ADMIN_CAMERAS(Resource):
                         'uri' : camera.uri,
                         'owner' : camera.owner,
                         'create_date' : str(camera.create_date),
-                        'name' : camera.name
+                        'name' : camera.name,
+                        'update_date' : str(camera.update_date),
                     }
                 )
             data = {
@@ -812,7 +840,10 @@ class ADMIN_PROCESSORS(Resource):
                         "used":c.cpu.used
                     },
                     "owner":c.owner,
-                    "create_date":str(c.create_date)
+                    "create_date":str(c.create_date),
+                    "update_date":str(c.update_date),
+                    "memory_used_percent": int(c.memory.used/c.memory.total*100),
+                    "disk_used_percent": int(c.disk.used/c.disk.total*100),
                 })
             data = {
                 "data":c_node
@@ -855,7 +886,9 @@ class ADMIN_GET_PROCESSORS(Resource):
                     "cpu":{
                         "used_per_cpu":c.cpu.used_per_cpu,
                         "used":c.cpu.used
-                    }
+                    },
+                    "update_date":str(c.update_date),
+                    
                 })
             data = {
                 "compute_node": c_node

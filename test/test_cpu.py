@@ -5,11 +5,11 @@ import httplib2
 import json
 import requests
 import time
-salt = 'อิอิอุอิ'
+salt = 'project_master_5810110451'
 
 name = "NVR"
 owner = "5810110451@psu.ac.th"
-key = "fgkr95tOmd"
+key = "b8k7YRieha"
 online = "True"
 
 pid = os.getpid()

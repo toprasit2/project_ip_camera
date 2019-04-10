@@ -56,7 +56,7 @@ class CamerasForm(FlaskForm):
     name = StringField('Name of camera', validators=[DataRequired(), Length(min=1, max=12)])
     description = StringField('Description', validators=[Length(min=0, max=30)])
     uri = StringField('URI', validators=[DataRequired(), Length(min=2, max=200)])
-    refresh = RadioField('Update Frame', choices=[('yes', 'Yes'), ('no', 'No')], validators=[DataRequired()])
+    refresh = RadioField('Auto Refresh Frame', choices=[('yes', 'Yes'), ('no', 'No')], validators=[DataRequired()])
     # port = StringField('Port', validators=[DataRequired(), Length(min=2, max=12)])
     # username = StringField('Username', validators=[DataRequired(), Length(min=2, max=12)])
     # password = PasswordField('Password', validators=[DataRequired(), Length(min=2, max=20)])

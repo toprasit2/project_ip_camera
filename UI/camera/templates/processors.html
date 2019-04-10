@@ -58,8 +58,8 @@
                 </p>
             </div>
             <div class="col m6">
-                <p style="color:white">key: <span id="{{'key'+n.id}}">{{n.key}}</span> <a class="modal-trigger" href="#modal1"><i id={{n.id}} class="tiny material-icons">autorenew</i>reset-key</a></p>
-                <div id="modal1" class="modal">
+                <p style="color:white">key: <span id="{{'key'+n.id}}">{{n.key}}</span> <a class="modal-trigger" href="{{'#modal'+'ck'+n.id}}"><i id={{n.id}} class="tiny material-icons">autorenew</i>reset-key</a></p>
+                <div id="{{'modal'+'ck'+n.id}}" class="modal">
                         <div class="modal-content">
                           <h4>ต้องการรีเซ็ตรหัสผ่าน {{ n.name }} ใช่หรือไม่</h4>
                         </div>
@@ -195,6 +195,7 @@
     var changeKey = (x) => {
         var xhttp2 = new XMLHttpRequest();
         xhttp2.open("GET", "http://127.0.0.1:5000/changeKey/"+x, true);
+        console.log(x)
         var mimeType = "text/plain";  
         xhttp2.setRequestHeader('Content-Type', mimeType);
         xhttp2.onreadystatechange = function() {

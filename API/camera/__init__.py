@@ -34,7 +34,7 @@ from google.auth.transport import requests
 
 from camera.models import MyUsers, GroupOfCameras, Cameras,ComputeNodes, SharedCameras, PermissionList
 
-salt = 'อิอิอุอิ'
+salt = 'project_master_5810110451'
 
 def check_token(access_token):
     url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'% access_token)

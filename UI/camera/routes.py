@@ -12,7 +12,7 @@ import jwt
 from nokkhumclient import client
 
 
-salt = 'อิอิอุอิ'
+salt = 'project_master_5810110451'
 
 
 def nokkhum_client():        
@@ -294,7 +294,7 @@ def get_shared_cameras():
         s['permission_display_1x1'] = int(shared_camera['count_permission']/1)+1
     else:
         s['permission_display_1x1'] = int(shared_camera['count_permission']/1)
-    cameras_1x1 = [shared_camera['email'][x:x+1] for x in range(0, len(shared_camera['email']),1)]
+    cameras_1x1 = [shared_camera['permission'][x:x+1] for x in range(0, shared_camera['count_permission'],1)]
     s['permission_cameras_1x1'] = cameras_1x1
     
     count = int(shared_camera['count_permission']/4)
